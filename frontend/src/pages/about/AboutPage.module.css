@@ -1,0 +1,41 @@
+.root {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f5f3ee 0%, #faf8f5 50%, #f5f0e8 100%);
+}
+
+.banner {
+  background: linear-gradient(
+    180deg,
+    rgba(245, 240, 230, 0.98) 0%,
+    rgba(250, 247, 242, 0.98) 100%
+  );
+  border-bottom: 2px solid #b8962e;
+  box-shadow: 0 4px 24px rgba(184, 150, 46, 0.08);
+}
+
+.bannerTitle {
+  font-family: inherit;
+}
+
+.bannerSubtitleEn {
+  letter-spacing: 0.15em;
+}
+
+.bannerSubtitleHe {
+  font-family: "Assistant", "Alef", sans-serif;
+}
+
+.iconWrap {
+  text-align: center;
+}
+
+.missionBox {
+  background-color: rgba(255, 254, 249, 0.8);
+  border: 1px solid #b8962e;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(184, 150, 46, 0.08);
+}
+
+.missionText {
+  line-height: 1.8;
+}
