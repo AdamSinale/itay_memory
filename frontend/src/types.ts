@@ -7,6 +7,8 @@ export interface Soldier {
   gender: string | null
   caption_en: string | null
   caption_he: string | null
+  birth_date: string | null
+  memorial_date: string | null
 }
 
 export interface AboutData {

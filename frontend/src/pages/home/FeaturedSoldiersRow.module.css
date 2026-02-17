@@ -1,9 +1,23 @@
 .row {
   display: flex;
+  align-items: flex-end;
   flex-wrap: wrap;
   width: 70%;
+  height: 100%;
   justify-content: center;
-  gap: 12px;
-  padding: 0 8px;
+  gap: 14px;
   margin: 0 auto;
+}
+
+.row > *:first-child,
+.row > *:last-child {
+  height: 100%;
+}
+
+.row > *:nth-child(2) {
+  margin-left: 24px;
+}
+
+.row > *:nth-last-child(2) {
+  margin-right: 24px;
 }

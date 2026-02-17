@@ -1,5 +1,12 @@
 .paper {
-  background-color: rgba(255, 254, 249, 0.95);
-  border: 1px solid #b8962e;
-  box-shadow: 0 4px 20px rgba(184, 150, 46, 0.12);
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.paper:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: #d4af37;
 }

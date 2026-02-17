@@ -1,6 +1,6 @@
 """Soldier ORM entity."""
 import uuid
-from sqlalchemy import Column, String, Text
+from sqlalchemy import Column, Date, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.database import Base
@@ -18,3 +18,5 @@ class Soldier(Base):
     gender = Column(String(20), nullable=True)
     caption_en = Column(Text, nullable=True)
     caption_he = Column(Text, nullable=True)
+    birth_date = Column(Date, nullable=True)
+    memorial_date = Column(Date, nullable=True)

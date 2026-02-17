@@ -27,13 +27,8 @@ function App() {
     >
       <AppShell
         header={{ height: 72 }}
-        padding="md"
-        styles={{
-          main: {
-            backgroundColor: 'transparent',
-            minHeight: '100vh',
-          },
-        }}
+        padding={0}
+        classNames={{ main: 'app-shell-main' }}
       >
         <AppNavbar />
         <AppShell.Main>

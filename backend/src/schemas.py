@@ -1,4 +1,5 @@
 """Pydantic request/response schemas."""
+from datetime import date
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -13,6 +14,8 @@ class SoldierSchema(BaseModel):
     gender: str | None
     caption_en: str | None
     caption_he: str | None
+    birth_date: date | None = None
+    memorial_date: date | None = None
 
     class Config:
         from_attributes = True

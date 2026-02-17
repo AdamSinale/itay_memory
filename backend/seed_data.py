@@ -2,6 +2,7 @@
 import os
 import sys
 import uuid
+from datetime import date
 
 # Ensure backend root is on path so src can be imported
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -46,6 +47,13 @@ def _migrate_schema():
                 pass
             else:
                 raise
+        for col in ("birth_date", "memorial_date"):
+            try:
+                conn.execute(text(f"ALTER TABLE soldiers ADD COLUMN {col} DATE"))
+                conn.commit()
+            except Exception as e:
+                if "duplicate column name" not in str(e).lower():
+                    raise
 
 
 def seed(force_reseed=False):
@@ -76,6 +84,8 @@ def seed(force_reseed=False):
             gender="male",
             caption_en="In memory of those who gave their all.",
             caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
+            birth_date=date(2004, 7, 15),
+            memorial_date=date(2024, 11, 2),
         ))
         
         db.add(Soldier(
@@ -87,6 +97,8 @@ def seed(force_reseed=False):
             gender="male",
             caption_en="In memory of those who gave their all.",
             caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
+            birth_date=date(2003, 3, 26),
+            memorial_date=date(2023, 10, 31),
         ))
 
         db.add(Soldier(
@@ -98,6 +110,8 @@ def seed(force_reseed=False):
             gender="male",
             caption_en="In memory of those who gave their all.",
             caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
+            birth_date=date(2004, 7, 19),
+            memorial_date=date(2024, 5, 5),
         ))
 
         for i in range(SOLDIER_COUNT):
@@ -110,6 +124,8 @@ def seed(force_reseed=False):
                 gender="male" if i % 3 != 1 else "female",
                 caption_en="In memory of those who gave their all." if i == 0 else None,
                 caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל." if i == 0 else None,
+                birth_date=date(1990 + (i % 10), (i % 12) + 1, (i % 28) + 1),
+                memorial_date=date(2023 + (i % 2), (i % 12) + 1, (i % 28) + 1),
             ))
 
         if not db.query(AboutPage).first():

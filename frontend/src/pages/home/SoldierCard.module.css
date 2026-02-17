@@ -5,10 +5,11 @@
   border: 1px solid #b8962e;
   box-shadow: 0 4px 16px rgba(184, 150, 46, 0.12);
   text-align: center;
-  display: flex;
   flex-direction: column;
   border-top-left-radius: 153px;
   border-top-right-radius: 153px;
+  cursor: pointer;
+  height: 75%;
 }
 
 .photo {
@@ -20,3 +21,4 @@
   border: 1px solid #b8962e;
   flex-shrink: 0;
 }
+

@@ -1,41 +1,117 @@
-.root {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #f5f3ee 0%, #faf8f5 50%, #f5f0e8 100%);
+
+
+.articleHeader {
+  display: grid;
+  place-items: start center;
+  position: relative;
+  height: calc(100svh - 45px);
+  overflow-x: clip;
 }
 
-.banner {
-  background: linear-gradient(
-    180deg,
-    rgba(245, 240, 230, 0.98) 0%,
-    rgba(250, 247, 242, 0.98) 100%
-  );
-  border-bottom: 2px solid #b8962e;
-  box-shadow: 0 4px 24px rgba(184, 150, 46, 0.08);
-}
-
-.bannerTitle {
-  font-family: inherit;
-}
-
-.bannerSubtitleEn {
-  letter-spacing: 0.15em;
-}
-
-.bannerSubtitleHe {
-  font-family: "Assistant", "Alef", sans-serif;
-}
-
-.iconWrap {
+.headerContent {
   text-align: center;
+  animation: fade-out linear;
+  animation-timeline: view();
+  animation-range: exit -200px;
+}
+
+.headerImage {
+  grid-column: 1 / -1;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  transform-origin: bottom;
+  animation: header-image-animation linear;
+  animation-timeline: view();
+  animation-range: exit;
+}
+
+@keyframes header-image-animation {
+  25% {
+    opacity: 1;
+  }
+  85%,
+  100% {
+    scale: 3;
+  }
+}
+
+.contentSection {
+  background-image: url('./AboutBackground.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-bottom: 3rem;
+}
+
+.mainTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.iconsSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconCard {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.iconCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(184, 150, 46, 0.12);
+  border-color: #d4af37;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fdf9e7 0%, #f9f0c7 100%);
+  color: #b8962e;
+  transition: all 0.3s ease;
+}
+
+.iconCard:hover .iconWrapper {
+  background: linear-gradient(135deg, #f9f0c7 0%, #f2e4a4 100%);
+  transform: scale(1.05);
 }
 
 .missionBox {
-  background-color: rgba(255, 254, 249, 0.8);
-  border: 1px solid #b8962e;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(184, 150, 46, 0.08);
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.missionBox:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-color: #d4af37;
 }
 
 .missionText {
-  line-height: 1.8;
+  line-height: 1.75;
+  font-weight: 400;
 }

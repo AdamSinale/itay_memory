@@ -1,0 +1,15 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+}
+
+.app-shell-main {
+  background-color: transparent;
+  height: calc(100vh - 45px);
+  padding: 0;
+}
