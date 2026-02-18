@@ -54,6 +54,16 @@ def _get_soldier_by_name_sync(db: Session, name: str) -> Soldier | None:
     return db.query(Soldier).filter(Soldier.name == name).first()
 
 
+def _get_soldier_by_id_sync(db: Session, soldier_id: UUID) -> Soldier | None:
+    """Return the soldier with the given id, or None if not found."""
+    return db.query(Soldier).filter(Soldier.id == soldier_id).first()
+
+
+async def get_soldier_by_id(db: Session, soldier_id: UUID) -> Soldier | None:
+    """Return the soldier with the given id, or None if not found."""
+    return await asyncio.to_thread(_get_soldier_by_id_sync, db, soldier_id)
+
+
 async def get_soldier_by_name(db: Session, name: str = HERO_SOLDIER_NAME) -> Soldier | None:
     """Return the soldier with the given name, or None if not found."""
     return await asyncio.to_thread(_get_soldier_by_name_sync, db, name)

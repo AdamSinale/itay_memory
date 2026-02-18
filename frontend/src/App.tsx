@@ -5,6 +5,7 @@ import { MantineProvider, AppShell } from '@mantine/core'
 import { HomePage } from './pages/home/HomePage'
 import { AboutPage } from './pages/about/AboutPage'
 import { AddHeroPage } from './pages/addHero/AddHeroPage'
+import SoldierPage from './pages/soldier/SoldierPage'
 import { theme } from './theme'
 import { AppNavbar } from './components/Navbar'
 
@@ -34,6 +35,7 @@ function App() {
         <AppShell.Main>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/soldier/:id" element={<SoldierPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/add-hero" element={<AddHeroPage />} />
           </Routes>

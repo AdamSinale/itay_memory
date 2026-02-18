@@ -1,5 +1,6 @@
 import { Card, Box, Text } from '@mantine/core'
 import type { Soldier } from '../../types'
+import { Link } from 'react-router-dom'
 import styles from './SoldierCard.module.css'
 
 interface SoldierCardProps {
@@ -11,13 +12,8 @@ export function SoldierCard({ soldier }: SoldierCardProps) {
   const photoUrl = soldier.photo_url || 'placeholder-soldier.svg'
   const src = photoUrl.startsWith('/') ? photoUrl : `/images/${photoUrl}`
   return (
-    <Card
-      shadow="sm"
-      padding="xs"
-      radius="md"
-      withBorder
-      className={styles.card}
-    >
+    <Card className={styles.card}>
+      <Link to={`/soldier/${soldier.id}`} className={styles.link}></Link>
       <Box
         className={styles.photo}
         style={{ backgroundImage: `url(${src})` }}

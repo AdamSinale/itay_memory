@@ -13,6 +13,7 @@ from src.services.Soldier import (
     get_featured_soldiers,
     get_random_soldiers,
     get_soldier_by_name,
+    get_soldier_by_id,
 )
 
 router = APIRouter(prefix="/soldiers", tags=["soldiers"])
@@ -76,3 +77,12 @@ async def get_closest_memorial_soldier_route(db: Session = Depends(get_db)):
 async def list_soldiers(db: Session = Depends(get_db)):
     """Returns all soldiers."""
     return await get_all_soldiers(db)
+
+
+@router.get("/{soldier_id}", response_model=SoldierSchema)
+async def get_soldier_by_id_route(soldier_id: UUID, db: Session = Depends(get_db)):
+    """Returns a single soldier by id."""
+    soldier = await get_soldier_by_id(db, soldier_id)
+    if soldier is None:
+        raise HTTPException(status_code=404, detail="Soldier not found")
+    return soldier

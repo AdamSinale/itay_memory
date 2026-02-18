@@ -58,3 +58,12 @@ export async function getClosestMemorialSoldier(): Promise<Soldier | null> {
     return null
   }
 }
+
+export async function getSoldierById(id: string): Promise<Soldier | null> {
+  try {
+    const res = await http.get<Soldier>(`/soldiers/${id}`)
+    return res.data
+  } catch {
+    return null
+  }
+}
