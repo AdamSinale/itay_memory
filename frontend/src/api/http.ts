@@ -7,30 +7,22 @@ const http = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-export async function getHeroSoldier(): Promise<Soldier | null> {
+export async function getHeroSoldier(lang: string = 'he'): Promise<Soldier | null> {
   try {
-    const res = await http.get<Soldier>('/soldiers/hero')
+    const res = await http.get<Soldier>(`/soldiers/hero?lang=${lang}`)
     return res.data
   } catch {
     return null
   }
 }
 
-export async function getFeaturedSoldiers(): Promise<Soldier[]> {
-  try {
-    const res = await http.get<Soldier[]>('/soldiers/featured')
-    return res.data ?? []
-  } catch {
-    return []
-  }
-}
-
 export async function getRandomSoldiers(
   limit: number,
+  lang: string = 'he',
   excludeIds?: string[]
 ): Promise<Soldier[]> {
   try {
-    const params = new URLSearchParams({ limit: String(limit) })
+    const params = new URLSearchParams({ limit: String(limit), lang })
     if (excludeIds?.length) {
       params.set('exclude', excludeIds.join(','))
     }
@@ -41,27 +33,27 @@ export async function getRandomSoldiers(
   }
 }
 
-export async function getClosestBirthdaySoldier(): Promise<Soldier | null> {
+export async function getClosestBirthdaySoldier(lang: string = 'he'): Promise<Soldier | null> {
   try {
-    const res = await http.get<Soldier>('/soldiers/closest-birthday')
+    const res = await http.get<Soldier>(`/soldiers/closest-birthday?lang=${lang}`)
     return res.data
   } catch {
     return null
   }
 }
 
-export async function getClosestMemorialSoldier(): Promise<Soldier | null> {
+export async function getClosestMemorialSoldier(lang: string = 'he'): Promise<Soldier | null> {
   try {
-    const res = await http.get<Soldier>('/soldiers/closest-memorial')
+    const res = await http.get<Soldier>(`/soldiers/closest-memorial?lang=${lang}`)
     return res.data
   } catch {
     return null
   }
 }
 
-export async function getSoldierById(id: string): Promise<Soldier | null> {
+export async function getSoldierById(id: string, lang: string = 'he'): Promise<Soldier | null> {
   try {
-    const res = await http.get<Soldier>(`/soldiers/${id}`)
+    const res = await http.get<Soldier>(`/soldiers/${id}?lang=${lang}`)
     return res.data
   } catch {
     return null

@@ -9,17 +9,11 @@ export function HomeSectionHeader() {
   return (
     <Box mb="xl" className={styles.wrapper} style={{ textAlign: isHe ? 'right' : 'left' }}>
       <Title order={2} c="dark.8" mb={4} className={styles.sectionTitle}>
-        {isHe ? 'קהילת איתי' : 'Itay\'s Community'}
+        {isHe ? 'לזכר אהובנו איתי פריזט ז״ל' : 'In memory of our beloved Itay Parizat'}
       </Title>
-      {isHe ? (
-        <Text size="sm" c="dark.5" className={styles.subtitleHe}>
-          סיפורי גיבורינו
-        </Text>
-      ) : (
-        <Text size="sm" c="dark.5" tt="uppercase" fw={600} className={styles.subtitleEn}>
-          Stories of our Heroes
-        </Text>
-      )}
+      <Text size="sm" c="dark.5" tt="uppercase" className={styles.subtitle}>
+         {isHe ? 'ושאר גיבורי ישראל שנפלו למעננו' : 'and the other heroes who fell for our sake.'}
+      </Text>
     </Box>
   )
 }

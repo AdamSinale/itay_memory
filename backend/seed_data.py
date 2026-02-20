@@ -1,135 +1,140 @@
 """Seed placeholder data for development. Run from backend/ after DB is created."""
+import json
 import os
 import sys
 import uuid
 from datetime import date
 
-# Ensure backend root is on path so src can be imported
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.database import Base
-from src.entities.Soldier import Soldier
+from src.entities.SoldierHe import SoldierHe
+from src.entities.SoldierEn import SoldierEn
 from src.entities.AboutPage import AboutPage
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./memorial.db")
 if DATABASE_URL.startswith("sqlite"):
-    # Path relative to backend/ when running from backend
     if not DATABASE_URL.startswith("sqlite:///"):
         DATABASE_URL = "sqlite:///./memorial.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {})
 Session = sessionmaker(bind=engine)
 
-
 SOLDIER_COUNT = 4
 
 
-def _migrate_schema():
-    """Align DB schema with current model (e.g. add gender, drop is_featured)."""
-    with engine.connect() as conn:
-        try:
-            conn.execute(text("ALTER TABLE soldiers ADD COLUMN gender VARCHAR(20)"))
-            conn.commit()
-        except Exception as e:
-            if "duplicate column name" not in str(e).lower():
-                raise
-        try:
-            conn.execute(text("ALTER TABLE soldiers DROP COLUMN is_featured"))
-            conn.commit()
-        except Exception as e:
-            msg = str(e).lower()
-            if "no such column" in msg or "syntax error" in msg or "not supported" in msg:
-                pass
-            else:
-                raise
-        for col in ("birth_date", "memorial_date"):
-            try:
-                conn.execute(text(f"ALTER TABLE soldiers ADD COLUMN {col} DATE"))
-                conn.commit()
-            except Exception as e:
-                if "duplicate column name" not in str(e).lower():
-                    raise
+SOLDIERS_DIR = os.path.join(os.path.dirname(__file__), "soldiers")
+
+
+def parse_date(date_str: str | None) -> date | None:
+    """Parse a date string (YYYY-MM-DD) to a date object."""
+    if not date_str:
+        return None
+    parts = date_str.split("-")
+    return date(int(parts[0]), int(parts[1]), int(parts[2]))
+
+
+def load_soldier_json(filename: str) -> dict:
+    """Load a soldier JSON from the soldiers/ folder."""
+    path = os.path.join(SOLDIERS_DIR, filename)
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def soldier_json_to_row(data: dict, sid: uuid.UUID) -> dict:
+    """Convert a soldier JSON (he/en captions) to a soldiers_data row."""
+    return {
+        "id": sid,
+        "name_he": data["he"]["name"],
+        "name_en": data["en"]["name"],
+        "rank_he": data["he"]["rank"],
+        "rank_en": data["en"]["rank"],
+        "unit_he": data["he"]["unit"],
+        "unit_en": data["en"]["unit"],
+        "photo_url": data.get("photo_url"),
+        "gender": data.get("gender"),
+        "caption_he": data["he"]["caption"],
+        "caption_en": data["en"]["caption"],
+        "birth_date": parse_date(data.get("birth_date")),
+        "memorial_date": parse_date(data.get("memorial_date")),
+    }
 
 
 def seed(force_reseed=False):
     Base.metadata.create_all(bind=engine)
-    _migrate_schema()
     db = Session()
     try:
-        existing = db.query(Soldier).count()
-        if existing == SOLDIER_COUNT and not force_reseed:
-            print(f"DB already has {SOLDIER_COUNT} soldiers, skipping seed.")
-            return
-        if existing > 0 and force_reseed:
-            db.query(Soldier).delete()
-            db.commit()
-            print(f"Cleared existing soldiers, seeding {SOLDIER_COUNT}.")
-        elif existing > 0:
-            print(f"Data already exists ({existing} soldiers). Run with --force to reset to {SOLDIER_COUNT}.")
-            return
-
-        base_url = os.getenv("BASE_URL", "http://localhost:3000")
-
-        itays_bio_path = os.path.join(os.path.dirname(__file__), "itays_bio")
-        with open(itays_bio_path, "r", encoding="utf-8") as f:
-            itays_bio_content = f.read().strip()
-
-        db.add(Soldier(
-            id=uuid.uuid4(),
-            name="Itay Parizat",
-            rank="Sergeant",
-            unit="Givati, Shaked",
-            photo_url="itay.png",
-            gender="male",
-            caption_en="In memory of those who gave their all.",
-            caption_he=itays_bio_content,
-            birth_date=date(2004, 7, 15),
-            memorial_date=date(2024, 11, 2),
-        ))
+        existing_he = db.query(SoldierHe).count()
+        existing_en = db.query(SoldierEn).count()
         
-        db.add(Soldier(
-            id=uuid.uuid4(),
-            name="Shay Arvas",
-            rank="Sergeant",
-            unit="Givati, Shaked",
-            photo_url="shay.png",
-            gender="male",
-            caption_en="In memory of those who gave their all.",
-            caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
-            birth_date=date(2003, 3, 26),
-            memorial_date=date(2023, 10, 31),
-        ))
+        if existing_he == SOLDIER_COUNT and existing_en == SOLDIER_COUNT and not force_reseed:
+            print(f"DB already has {SOLDIER_COUNT} soldiers in each table, skipping seed.")
+            return
+        
+        if force_reseed:
+            db.query(SoldierHe).delete()
+            db.query(SoldierEn).delete()
+            db.commit()
+            print(f"Cleared existing soldiers, seeding {SOLDIER_COUNT} per table.")
+        elif existing_he > 0 or existing_en > 0:
+            print(f"Data already exists (he={existing_he}, en={existing_en}). Run with --force to reset.")
+            return
 
-        db.add(Soldier(
-            id=uuid.uuid4(),
-            name="Reuven Asulin",
-            rank="Sergeant",
-            unit="Givati, Shaked",
-            photo_url="reuven.jpg",
-            gender="male",
-            caption_en="In memory of those who gave their all.",
-            caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
-            birth_date=date(2004, 7, 19),
-            memorial_date=date(2024, 5, 5),
-        ))
+        itay_data = load_soldier_json("itay_data.json")
+        shay_data = load_soldier_json("shay_data.json")
+
+        reuven_data = load_soldier_json("reuven_data.json")
+
+        soldiers_data = [
+            soldier_json_to_row(itay_data, uuid.uuid4()),
+            soldier_json_to_row(shay_data, uuid.uuid4()),
+            soldier_json_to_row(reuven_data, uuid.uuid4()),
+        ]
 
         for i in range(SOLDIER_COUNT):
-            db.add(Soldier(
-                id=uuid.uuid4(),
-                name=f"Soldier {i + 1}",
-                rank="Sergeant" if i == 0 else ("Private" if i % 2 else "Corporal"),
-                unit=f"Unit {((i % 3) + 1)}",
-                photo_url=None,
-                gender="male" if i % 3 != 1 else "female",
-                caption_en="In memory of those who gave their all." if i == 0 else None,
-                caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל." if i == 0 else None,
-                birth_date=date(1990 + (i % 10), (i % 12) + 1, (i % 28) + 1),
-                memorial_date=date(2023 + (i % 2), (i % 12) + 1, (i % 28) + 1),
+            soldiers_data.append({
+                "id": uuid.uuid4(),
+                "name_he": f"חייל {i + 1}",
+                "name_en": f"Soldier {i + 1}",
+                "rank_he": "סמל" if i == 0 else ("טוראי" if i % 2 else "רב טוראי"),
+                "rank_en": "Sergeant" if i == 0 else ("Private" if i % 2 else "Corporal"),
+                "unit_he": f"יחידה {((i % 3) + 1)}",
+                "unit_en": f"Unit {((i % 3) + 1)}",
+                "photo_url": None,
+                "gender": "male" if i % 3 != 1 else "female",
+                "caption_he": "לזכר נופלים שניצלו את חייהם בשביל ישראל." if i == 0 else None,
+                "caption_en": "In memory of those who gave their all." if i == 0 else None,
+                "birth_date": date(1990 + (i % 10), (i % 12) + 1, (i % 28) + 1),
+                "memorial_date": date(2023 + (i % 2), (i % 12) + 1, (i % 28) + 1),
+            })
+
+        for data in soldiers_data:
+            db.add(SoldierHe(
+                id=data["id"],
+                name=data["name_he"],
+                rank=data["rank_he"],
+                unit=data["unit_he"],
+                photo_url=data["photo_url"],
+                gender=data["gender"],
+                caption=data["caption_he"],
+                birth_date=data["birth_date"],
+                memorial_date=data["memorial_date"],
+            ))
+            db.add(SoldierEn(
+                id=data["id"],
+                name=data["name_en"],
+                rank=data["rank_en"],
+                unit=data["unit_en"],
+                photo_url=data["photo_url"],
+                gender=data["gender"],
+                caption=data["caption_en"],
+                birth_date=data["birth_date"],
+                memorial_date=data["memorial_date"],
             ))
 
         if not db.query(AboutPage).first():
@@ -141,12 +146,11 @@ def seed(force_reseed=False):
             ))
 
         db.commit()
-        print(f"Seed completed: {SOLDIER_COUNT} soldiers.")
+        print(f"Seed completed: {len(soldiers_data)} soldiers in each table (he + en).")
     finally:
         db.close()
 
 
 if __name__ == "__main__":
-    import sys
     force = "--force" in sys.argv or "-f" in sys.argv
     seed(force_reseed=force)

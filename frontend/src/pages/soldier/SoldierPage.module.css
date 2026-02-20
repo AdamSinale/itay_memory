@@ -1,85 +1,106 @@
-.page {
-  height: 100%;
+
+.pageContent {
+  position: relative;
+  padding: 0 10%;
+  padding-top: 24px;
+  padding-bottom: 48px;
+  height: calc(100% - 24px - 48px);
   background-image: url("./SoldierPage.PNG");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
-  padding: 0 10%;
-}
-
-.pageContent {
-  position: relative;
-  padding-top: 24px;
-  padding-bottom: 48px;
 }
 
 .heroGrid {
   display: grid;
-  gap: 28px;
+  gap: 5px;
   align-items: start;
-
-  /* left text + right image column */
-  grid-template-columns: 1fr 380px;
-
-  /* make a few rows so the image can “end” before the bottom-right text starts */
-  grid-template-rows: auto auto auto;
-
-  grid-template-areas:
-    "introText   imageWrap"
-    "fullText imageWrap"
-    "fullText  fullText";
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content min-content 1fr;
+  height: 100%;
 }
 
-.introText {
+.soldierName {
   grid-column: 1;
   grid-row: 1;
+}
+
+.soldierBasicInfo {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  isolation: isolate;
+  padding: 3%;
+}
+
+.soldierBasicInfo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image: url("./TextCon.png");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
+  opacity: 0.7;
+  z-index: -1;
 }
 
-.imageWrap {
+.soldierImage {
   grid-column: 2;
-  grid-row: 1 / span 2; /* occupies intro + next row */
+  grid-row: 1 / span 3; /* occupies intro + next row */
 }
 
 .heroImage {
-  width: 100%;
-  height: auto;
-  max-height: 70vh;
+  min-height: 500px;
+  max-height: 90vh;
   display: block;
   border-radius: 12px;
 }
 
-/* Full width starts AFTER the imageWrap row-span */
-.fullText {
-  /* grid-column: 1 / -1;
-  grid-row: 3; */
+.soldierBio {
+  grid-column: 1;
+  grid-row: 3;
+  position: relative;
+  isolation: isolate;
+  height: 92%;
+  padding: 2% 0 6% 0;
+  overflow-y: auto;
+}
+
+
+.soldierBio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image: url("./TextCon.png");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  padding: 20px;
-  max-height: 47%;
-  overflow-y: auto;
+  opacity: 0.5;
+  z-index: -1;
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .heroGrid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  }
 
-  .imageWrap {
-    grid-column: 1;
-    grid-row: auto;
-  }
+.soldierBioContent {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 0 4%;
+}
 
-  .fullText {
-    grid-column: 1;
-    grid-row: auto;
-  }
+.soldierBioContentLtr {
+  direction: rtl;
+}
+
+.soldierBioContentLtr > * {
+  direction: ltr;
+}
+
+.soldierBioContentRtl {
+  direction: ltr;
+}
+
+.soldierBioContentRtl > * {
+  direction: rtl;
 }

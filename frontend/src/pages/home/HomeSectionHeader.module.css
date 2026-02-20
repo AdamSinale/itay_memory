@@ -10,10 +10,8 @@
   font-size: clamp(1.5rem, 4vw, 2rem);
 }
 
-.subtitleEn {
+.subtitle {
   letter-spacing: 0.12em;
-}
-
-.subtitleHe {
   font-family: "Assistant", "Alef", sans-serif;
+  font-weight: 900;
 }

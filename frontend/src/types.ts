@@ -5,8 +5,7 @@ export interface Soldier {
   unit: string
   photo_url: string | null
   gender: string | null
-  caption_en: string | null
-  caption_he: string | null
+  caption: string | null
   birth_date: string | null
   memorial_date: string | null
 }

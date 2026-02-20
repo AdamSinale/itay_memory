@@ -18,26 +18,35 @@ from src.services.Soldier import (
 
 router = APIRouter(prefix="/soldiers", tags=["soldiers"])
 
-HERO_SOLDIER_NAME = "Itay Parizat"
+HERO_SOLDIER_NAME_HE = "איתי פריזט"
+HERO_SOLDIER_NAME_EN = "Itay Parizat"
 
 
 @router.get("/hero", response_model=SoldierSchema)
-async def get_hero_soldier(db: Session = Depends(get_db)):
+async def get_hero_soldier(
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns the main soldier presented in the hero card (by name)."""
-    soldier = await get_soldier_by_name(db, HERO_SOLDIER_NAME)
+    hero_name = HERO_SOLDIER_NAME_HE if lang == "he" else HERO_SOLDIER_NAME_EN
+    soldier = await get_soldier_by_name(db, hero_name, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="Soldier not found")
     return soldier
 
 
 @router.get("/featured", response_model=list[SoldierSchema])
-async def get_featured_soldiers_route(db: Session = Depends(get_db)):
+async def get_featured_soldiers_route(
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns [closest birthday, 3 random, closest memorial]. Single request for the featured row."""
-    return await get_featured_soldiers(db, limit=5)
+    return await get_featured_soldiers(db, limit=5, lang=lang)
 
 
 @router.get("/random", response_model=list[SoldierSchema])
 async def get_random_soldiers_route(
+    lang: str = Query("he", pattern="^(he|en)$"),
     db: Session = Depends(get_db),
     limit: int = Query(5, ge=1, le=20),
     exclude: str | None = Query(None, description="Comma-separated soldier IDs to exclude"),
@@ -52,37 +61,50 @@ async def get_random_soldiers_route(
                     exclude_ids.append(UUID(part))
                 except ValueError:
                     pass
-    return await get_random_soldiers(db, limit=limit, exclude_ids=exclude_ids or None)
+    return await get_random_soldiers(db, limit=limit, lang=lang, exclude_ids=exclude_ids or None)
 
 
 @router.get("/closest-birthday", response_model=SoldierSchema)
-async def get_closest_birthday_soldier_route(db: Session = Depends(get_db)):
+async def get_closest_birthday_soldier_route(
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns a soldier whose birthday is closest to today (next occurrence). Random if several tie."""
-    soldier = await get_closest_bd_soldier(db)
+    soldier = await get_closest_bd_soldier(db, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="No soldier with birth date found")
     return soldier
 
 
 @router.get("/closest-memorial", response_model=SoldierSchema)
-async def get_closest_memorial_soldier_route(db: Session = Depends(get_db)):
+async def get_closest_memorial_soldier_route(
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns a soldier whose memorial date is closest to today (next occurrence). Random if several tie."""
-    soldier = await get_closest_memorial_soldier(db)
+    soldier = await get_closest_memorial_soldier(db, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="No soldier with memorial date found")
     return soldier
 
 
 @router.get("", response_model=list[SoldierSchema])
-async def list_soldiers(db: Session = Depends(get_db)):
+async def list_soldiers(
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns all soldiers."""
-    return await get_all_soldiers(db)
+    return await get_all_soldiers(db, lang)
 
 
 @router.get("/{soldier_id}", response_model=SoldierSchema)
-async def get_soldier_by_id_route(soldier_id: UUID, db: Session = Depends(get_db)):
+async def get_soldier_by_id_route(
+    soldier_id: UUID,
+    lang: str = Query("he", pattern="^(he|en)$"),
+    db: Session = Depends(get_db),
+):
     """Returns a single soldier by id."""
-    soldier = await get_soldier_by_id(db, soldier_id)
+    soldier = await get_soldier_by_id(db, soldier_id, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="Soldier not found")
     return soldier

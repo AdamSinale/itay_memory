@@ -12,8 +12,7 @@ class SoldierSchema(BaseModel):
     unit: str
     photo_url: str | None
     gender: str | None
-    caption_en: str | None
-    caption_he: str | None
+    caption: str | None
     birth_date: date | None = None
     memorial_date: date | None = None
 

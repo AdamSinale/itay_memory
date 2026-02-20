@@ -2,13 +2,25 @@
 import asyncio
 import random
 from datetime import date
+from typing import Type
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from src.entities.Soldier import Soldier
+from src.entities.SoldierHe import SoldierHe
+from src.entities.SoldierEn import SoldierEn
 
-HERO_SOLDIER_NAME = "Itay Parizat"
+HERO_SOLDIER_NAME_HE = "איתי פריזט"
+HERO_SOLDIER_NAME_EN = "Itay Parizat"
+
+
+def _get_hero_name(lang: str) -> str:
+    return HERO_SOLDIER_NAME_HE if lang == "he" else HERO_SOLDIER_NAME_EN
+
+
+def _get_soldier_model(lang: str) -> Type[SoldierHe] | Type[SoldierEn]:
+    """Return the appropriate Soldier model based on language."""
+    return SoldierHe if lang == "he" else SoldierEn
 
 
 def _days_until_next_month_day(today: date, d: date) -> int:
@@ -25,10 +37,10 @@ def _days_until_next_memorial(today: date, d: date) -> int:
     return _days_until_next_month_day(today, d)
 
 
-def _get_featured_soldiers_sync(db: Session, limit: int) -> list[Soldier]:
+def _get_featured_soldiers_sync(db: Session, limit: int, lang: str):
     """Return [closest birthday, 3 random others, closest memorial] using split functions."""
-    first_soldier = _get_closest_bd_soldier_sync(db)
-    last_soldier = _get_closest_memorial_soldier_sync(db)
+    first_soldier = _get_closest_bd_soldier_sync(db, lang)
+    last_soldier = _get_closest_memorial_soldier_sync(db, lang)
     if last_soldier and first_soldier and last_soldier.id == first_soldier.id:
         last_soldier = None
 
@@ -38,7 +50,7 @@ def _get_featured_soldiers_sync(db: Session, limit: int) -> list[Soldier]:
     if last_soldier:
         exclude_ids.append(last_soldier.id)
 
-    middle = _get_random_soldiers_sync(db, limit=3, exclude_ids=exclude_ids)
+    middle = _get_random_soldiers_sync(db, limit=3, exclude_ids=exclude_ids, lang=lang)
 
     result = []
     if first_soldier:
@@ -49,34 +61,38 @@ def _get_featured_soldiers_sync(db: Session, limit: int) -> list[Soldier]:
     return result[:limit]
 
 
-def _get_soldier_by_name_sync(db: Session, name: str) -> Soldier | None:
+def _get_soldier_by_name_sync(db: Session, name: str, lang: str):
     """Return the soldier with the given name, or None if not found."""
-    return db.query(Soldier).filter(Soldier.name == name).first()
+    Model = _get_soldier_model(lang)
+    return db.query(Model).filter(Model.name == name).first()
 
 
-def _get_soldier_by_id_sync(db: Session, soldier_id: UUID) -> Soldier | None:
+def _get_soldier_by_id_sync(db: Session, soldier_id: UUID, lang: str):
     """Return the soldier with the given id, or None if not found."""
-    return db.query(Soldier).filter(Soldier.id == soldier_id).first()
+    Model = _get_soldier_model(lang)
+    return db.query(Model).filter(Model.id == soldier_id).first()
 
 
-async def get_soldier_by_id(db: Session, soldier_id: UUID) -> Soldier | None:
+async def get_soldier_by_id(db: Session, soldier_id: UUID, lang: str = "he"):
     """Return the soldier with the given id, or None if not found."""
-    return await asyncio.to_thread(_get_soldier_by_id_sync, db, soldier_id)
+    return await asyncio.to_thread(_get_soldier_by_id_sync, db, soldier_id, lang)
 
 
-async def get_soldier_by_name(db: Session, name: str = HERO_SOLDIER_NAME) -> Soldier | None:
+async def get_soldier_by_name(db: Session, name: str, lang: str = "he"):
     """Return the soldier with the given name, or None if not found."""
-    return await asyncio.to_thread(_get_soldier_by_name_sync, db, name)
+    return await asyncio.to_thread(_get_soldier_by_name_sync, db, name, lang)
 
 
 def _get_random_soldiers_sync(
-    db: Session, limit: int, exclude_ids: list[UUID] | None = None
-) -> list[Soldier]:
+    db: Session, limit: int, lang: str, exclude_ids: list[UUID] | None = None
+):
     """Return up to `limit` soldiers chosen randomly, excluding hero and any ids in exclude_ids."""
+    Model = _get_soldier_model(lang)
+    hero_name = _get_hero_name(lang)
     exclude_ids = list(exclude_ids) if exclude_ids else []
-    q = db.query(Soldier).filter(Soldier.name != HERO_SOLDIER_NAME)
+    q = db.query(Model).filter(Model.name != hero_name)
     if exclude_ids:
-        q = q.filter(Soldier.id.notin_(exclude_ids))
+        q = q.filter(Model.id.notin_(exclude_ids))
     candidates = list(q.all())
     if len(candidates) == 0:
         return []
@@ -86,21 +102,22 @@ def _get_random_soldiers_sync(
 
 
 async def get_random_soldiers(
-    db: Session, limit: int = 5, exclude_ids: list[UUID] | None = None
-) -> list[Soldier]:
+    db: Session, limit: int = 5, lang: str = "he", exclude_ids: list[UUID] | None = None
+):
     """Return up to `limit` soldiers chosen randomly. Excludes hero and ids in exclude_ids."""
-    return await asyncio.to_thread(_get_random_soldiers_sync, db, limit, exclude_ids)
+    return await asyncio.to_thread(_get_random_soldiers_sync, db, limit, lang, exclude_ids)
 
 
-async def get_featured_soldiers(db: Session, limit: int = 5) -> list[Soldier]:
+async def get_featured_soldiers(db: Session, limit: int = 5, lang: str = "he"):
     """Return featured soldiers: first=closest birthday, last=closest memorial date, rest random."""
-    return await asyncio.to_thread(_get_featured_soldiers_sync, db, limit)
+    return await asyncio.to_thread(_get_featured_soldiers_sync, db, limit, lang)
 
 
-def _get_closest_bd_soldier_sync(db: Session) -> Soldier | None:
+def _get_closest_bd_soldier_sync(db: Session, lang: str):
     """Return a soldier whose birthday is closest to today (next occurrence). Random if several tie."""
+    Model = _get_soldier_model(lang)
     soldiers_with_birth = [
-        s for s in db.query(Soldier).filter(Soldier.birth_date.isnot(None)).all()
+        s for s in db.query(Model).filter(Model.birth_date.isnot(None)).all()
     ]
     if not soldiers_with_birth:
         return None
@@ -111,10 +128,11 @@ def _get_closest_bd_soldier_sync(db: Session) -> Soldier | None:
     return random.choice(closest)
 
 
-def _get_closest_memorial_soldier_sync(db: Session) -> Soldier | None:
+def _get_closest_memorial_soldier_sync(db: Session, lang: str):
     """Return a soldier whose memorial date is closest to today (next occurrence). Random if several tie."""
+    Model = _get_soldier_model(lang)
     soldiers_with_memorial = [
-        s for s in db.query(Soldier).filter(Soldier.memorial_date.isnot(None)).all()
+        s for s in db.query(Model).filter(Model.memorial_date.isnot(None)).all()
     ]
     if not soldiers_with_memorial:
         return None
@@ -127,21 +145,22 @@ def _get_closest_memorial_soldier_sync(db: Session) -> Soldier | None:
     return random.choice(closest)
 
 
-async def get_closest_bd_soldier(db: Session) -> Soldier | None:
+async def get_closest_bd_soldier(db: Session, lang: str = "he"):
     """Return a soldier whose birthday is closest to now. Random if multiple tie."""
-    return await asyncio.to_thread(_get_closest_bd_soldier_sync, db)
+    return await asyncio.to_thread(_get_closest_bd_soldier_sync, db, lang)
 
 
-async def get_closest_memorial_soldier(db: Session) -> Soldier | None:
+async def get_closest_memorial_soldier(db: Session, lang: str = "he"):
     """Return a soldier whose memorial date is closest to now. Random if multiple tie."""
-    return await asyncio.to_thread(_get_closest_memorial_soldier_sync, db)
+    return await asyncio.to_thread(_get_closest_memorial_soldier_sync, db, lang)
 
 
-def _get_all_soldiers_sync(db: Session) -> list[Soldier]:
+def _get_all_soldiers_sync(db: Session, lang: str):
     """Return all soldiers."""
-    return list(db.query(Soldier).all())
+    Model = _get_soldier_model(lang)
+    return list(db.query(Model).all())
 
 
-async def get_all_soldiers(db: Session) -> list[Soldier]:
+async def get_all_soldiers(db: Session, lang: str = "he"):
     """Return all soldiers."""
-    return await asyncio.to_thread(_get_all_soldiers_sync, db)
+    return await asyncio.to_thread(_get_all_soldiers_sync, db, lang)
