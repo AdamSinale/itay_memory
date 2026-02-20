@@ -37,10 +37,6 @@ export default function SoldierPage() {
 
   const bio = soldier.caption_he || soldier.caption_en || "";
   const paragraphs = bio ? bio.split("\n").filter(Boolean) : [];
-  /* ~70% in left column (middle + bottom left), ~30% in bottom-right */
-  const split = Math.max(1, Math.ceil(paragraphs.length * 0.7));
-  const leftParagraphs = paragraphs.slice(0, split);
-  const rightParagraphs = paragraphs.slice(split);
 
   return (
     <div className={styles.page}>
@@ -64,30 +60,17 @@ export default function SoldierPage() {
             <img src={photoSrc} alt={soldier.name} className={styles.heroImage} />
           </div>
 
-          {/* Rows 2–4: fullText in left column only (beside image) */}
-          <div className={styles.fullTextLeft}>
-            {bio ? (
-              leftParagraphs.length > 0 ? (
-                leftParagraphs.map((p, i) => (
-                  <Text key={i} mb="sm">
-                    {p}
-                  </Text>
-                ))
-              ) : (
-                <Text c="dimmed">אין ביוגרפיה זמינה.</Text>
-              )
+          {/* fullText: beside image then spans full width below */}
+          <div className={styles.fullText}>
+            {paragraphs.length > 0 ? (
+              paragraphs.map((p, i) => (
+                <Text key={i} mb="sm">
+                  {p}
+                </Text>
+              ))
             ) : (
               <Text c="dimmed">אין ביוגרפיה זמינה.</Text>
             )}
-          </div>
-
-          {/* Row 5 right: continuation of text in bottom-right tile */}
-          <div className={styles.fullTextRight}>
-            {rightParagraphs.map((p, i) => (
-              <Text key={i} mb="sm">
-                {p}
-              </Text>
-            ))}
           </div>
         </div>
       </Container>

@@ -74,7 +74,11 @@ def seed(force_reseed=False):
             return
 
         base_url = os.getenv("BASE_URL", "http://localhost:3000")
-        
+
+        itays_bio_path = os.path.join(os.path.dirname(__file__), "itays_bio")
+        with open(itays_bio_path, "r", encoding="utf-8") as f:
+            itays_bio_content = f.read().strip()
+
         db.add(Soldier(
             id=uuid.uuid4(),
             name="Itay Parizat",
@@ -83,7 +87,7 @@ def seed(force_reseed=False):
             photo_url="itay.png",
             gender="male",
             caption_en="In memory of those who gave their all.",
-            caption_he="לזכר נופלים שניצלו את חייהם בשביל ישראל.",
+            caption_he=itays_bio_content,
             birth_date=date(2004, 7, 15),
             memorial_date=date(2024, 11, 2),
         ))

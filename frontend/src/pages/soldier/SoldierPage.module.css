@@ -5,7 +5,7 @@
   background-position: center;
   background-repeat: no-repeat;
   text-align: center;
-  padding: 0 17%;
+  padding: 0 10%;
 }
 
 .pageContent {
@@ -16,35 +16,33 @@
 
 .heroGrid {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  grid-auto-rows: auto;
-  gap: 24px 32px;
+  gap: 28px;
   align-items: start;
+
+  /* left text + right image column */
+  grid-template-columns: 1fr 380px;
+
+  /* make a few rows so the image can “end” before the bottom-right text starts */
+  grid-template-rows: auto auto auto;
+
+  grid-template-areas:
+    "introText   imageWrap"
+    "fullText imageWrap"
+    "fullText  fullText";
 }
 
-/* Row 1: introText (left) | heroImage (right) */
 .introText {
   grid-column: 1;
   grid-row: 1;
-  position: relative;
-}
-
-.introText::before {
-  content: "";
-  position: absolute;
-  inset: 0;
   background-image: url("./TextCon.png");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.6;
-  z-index: -1;
 }
 
-/* Image in right column, spans rows 1–4 */
 .imageWrap {
   grid-column: 2;
-  grid-row: 1 / span 4;
+  grid-row: 1 / span 2; /* occupies intro + next row */
 }
 
 .heroImage {
@@ -55,48 +53,24 @@
   border-radius: 12px;
 }
 
-/* Rows 2–5: fullText in left column (middle-left + bottom-left tiles) */
-.fullTextLeft {
-  grid-column: 1;
-  grid-row: 2 / 6;
-  position: relative;
-}
-
-.fullTextLeft::before {
-  content: "";
-  position: absolute;
-  inset: 0;
+/* Full width starts AFTER the imageWrap row-span */
+.fullText {
+  /* grid-column: 1 / -1;
+  grid-row: 3; */
   background-image: url("./TextCon.png");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.6;
-  z-index: -1;
-}
-
-/* Row 5 right: fullText in bottom-right tile only */
-.fullTextRight {
-  grid-column: 2;
-  grid-row: 5;
-  position: relative;
-}
-
-.fullTextRight::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("./TextCon.png");
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.6;
-  z-index: -1;
+  padding: 20px;
+  max-height: 47%;
+  overflow-y: auto;
 }
 
 /* Mobile */
 @media (max-width: 768px) {
   .heroGrid {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
   }
 
   .imageWrap {
@@ -104,12 +78,7 @@
     grid-row: auto;
   }
 
-  .fullTextLeft {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .fullTextRight {
+  .fullText {
     grid-column: 1;
     grid-row: auto;
   }
