@@ -13,8 +13,13 @@ export function FeaturedSoldiersRow({ soldiers }: FeaturedSoldiersRowProps) {
 
   return (
     <Box mb="xl" className={styles.row}>
-      {soldiers.map((soldier) => (
-        <SoldierCard key={soldier.id} soldier={soldier} />
+      {soldiers.map((soldier, index) => (
+        <SoldierCard
+          key={soldier.id}
+          soldier={soldier}
+          showBirthday={index === 0}
+          showMemorialDay={index === soldiers.length - 1}
+        />
       ))}
     </Box>
   )

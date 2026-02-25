@@ -87,13 +87,14 @@ def seed(force_reseed=False):
 
         itay_data = load_soldier_json("itay_data.json")
         shay_data = load_soldier_json("shay_data.json")
-
         reuven_data = load_soldier_json("reuven_data.json")
+        shachar_data = load_soldier_json("shachar_data.json")
 
         soldiers_data = [
             soldier_json_to_row(itay_data, uuid.uuid4()),
             soldier_json_to_row(shay_data, uuid.uuid4()),
             soldier_json_to_row(reuven_data, uuid.uuid4()),
+            soldier_json_to_row(shachar_data, uuid.uuid4()),
         ]
 
         for i in range(SOLDIER_COUNT):
