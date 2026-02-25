@@ -8,6 +8,8 @@
   flex-direction: column;
   border-top-left-radius: 153px;
   border-top-right-radius: 153px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   cursor: pointer;
   height: 75%;
   position: relative;

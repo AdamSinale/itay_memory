@@ -31,6 +31,20 @@
   }
 }
 
+.headerText {
+  width: 30%;
+  margin: 0 auto;
+  min-width: 300px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(250, 247, 240, 0.3) 0%,
+    rgba(250, 247, 240, 0.6) 40%,
+    rgba(250, 247, 240, 0.0) 90%,
+    transparent 100%
+  );
+  border-radius: 30px;
+  padding: 10px;
+}
 
 .mainTitle {
   font-size: clamp(2rem, 5vw, 3rem);
