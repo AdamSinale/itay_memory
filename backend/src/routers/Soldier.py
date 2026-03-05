@@ -1,12 +1,16 @@
 """Soldier API routes."""
+import os
+import uuid
+from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.schemas import SoldierSchema
 from src.services.Soldier import (
+    create_soldier,
     get_closest_bd_soldier,
     get_closest_memorial_soldier,
     get_all_soldiers,
@@ -15,6 +19,9 @@ from src.services.Soldier import (
     get_soldier_by_name,
     get_soldier_by_id,
 )
+
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
 router = APIRouter(prefix="/soldiers", tags=["soldiers"])
 
@@ -95,6 +102,77 @@ async def list_soldiers(
 ):
     """Returns all soldiers."""
     return await get_all_soldiers(db, lang)
+
+
+def _parse_date(s: str | None) -> date | None:
+    if not s or not s.strip():
+        return None
+    try:
+        parts = s.strip().split("-")
+        if len(parts) != 3:
+            return None
+        return date(int(parts[0]), int(parts[1]), int(parts[2]))
+    except (ValueError, IndexError):
+        return None
+
+
+def _save_upload(file: UploadFile) -> str | None:
+    """Save uploaded file to UPLOAD_DIR. Returns path like 'uploads/uuid.ext' or None."""
+    if not file or not file.filename:
+        return None
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        ext = ".jpg"
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    name = f"{uuid.uuid4().hex}{ext}"
+    path = os.path.join(UPLOAD_DIR, name)
+    with open(path, "wb") as f:
+        f.write(file.file.read())
+    return f"uploads/{name}"
+
+
+@router.post("", response_model=SoldierSchema, status_code=201)
+async def create_soldier_route(
+    db: Session = Depends(get_db),
+    name_he: str = Form(..., min_length=1),
+    name_en: str = Form(..., min_length=1),
+    rank_he: str = Form(..., min_length=1),
+    rank_en: str = Form(..., min_length=1),
+    unit_he: str = Form(..., min_length=1),
+    unit_en: str = Form(..., min_length=1),
+    caption_he: str | None = Form(None),
+    caption_en: str | None = Form(None),
+    birth_date: str | None = Form(None),
+    memorial_date: str | None = Form(None),
+    gender: str | None = Form(None),
+    photo: UploadFile | None = File(None),
+):
+    """Create a new soldier with optional photo. Bilingual fields required."""
+    caption_he_val = caption_he.strip() if caption_he and caption_he.strip() else None
+    caption_en_val = caption_en.strip() if caption_en and caption_en.strip() else None
+    birth = _parse_date(birth_date)
+    memorial = _parse_date(memorial_date)
+    gender_val = gender.strip() if gender and gender.strip() else None
+    photo_url = _save_upload(photo) if photo else None
+
+    soldier_id = uuid.uuid4()
+    row = await create_soldier(
+        db,
+        soldier_id=soldier_id,
+        name_he=name_he.strip(),
+        name_en=name_en.strip(),
+        rank_he=rank_he.strip(),
+        rank_en=rank_en.strip(),
+        unit_he=unit_he.strip(),
+        unit_en=unit_en.strip(),
+        caption_he=caption_he_val,
+        caption_en=caption_en_val,
+        birth_date=birth,
+        memorial_date=memorial,
+        gender=gender_val,
+        photo_url=photo_url,
+    )
+    return row
 
 
 @router.get("/{soldier_id}", response_model=SoldierSchema)

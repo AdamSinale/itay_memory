@@ -59,3 +59,10 @@ export async function getSoldierById(id: string, lang: string = 'he'): Promise<S
     return null
   }
 }
+
+export async function createSoldier(formData: FormData): Promise<Soldier> {
+  const res = await axios.post<Soldier>(`${http.defaults.baseURL}/soldiers`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return res.data
+}

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MantineProvider, AppShell } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import { HomePage } from './pages/home/HomePage'
 import { AboutPage } from './pages/about/AboutPage'
 import { AddHeroPage } from './pages/addHero/AddHeroPage'
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
+      <Notifications />
     <BrowserRouter
       future={{
         v7_startTransition: true,

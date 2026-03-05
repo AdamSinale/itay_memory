@@ -1,16 +1,15 @@
-import { Container, Title, Text } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { Box } from '@mantine/core'
+import { AddHeroFormHebrew, AddHeroFormEnglish } from './AddHeroForm'
+import styles from './AddHeroPage.module.css'
 
 export function AddHeroPage() {
-  const { t } = useTranslation()
+  const navigate = useNavigate()
+
   return (
-    <Container size="sm" py="xl">
-      <Title order={1} c="dark.8" mb="md">
-        {t('nav.addHero')}
-      </Title>
-      <Text c="dimmed">
-        Form to add a hero will be available here.
-      </Text>
-    </Container>
+    <Box className={styles.root}>
+      <AddHeroFormHebrew onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
+      <AddHeroFormEnglish onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
+    </Box>
   )
 }

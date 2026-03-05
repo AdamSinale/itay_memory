@@ -2,7 +2,15 @@ import { Card, Box, Text } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import type { Soldier } from '../../types'
 import { Link } from 'react-router-dom'
+import { API_URL } from '../../config'
 import styles from './SoldierCard.module.css'
+
+function getPhotoSrc(photoUrl: string | null): string {
+  if (!photoUrl) return '/images/placeholder-soldier.svg'
+  if (photoUrl.startsWith('uploads/')) return `${API_URL}/${photoUrl}`
+  if (photoUrl.startsWith('/')) return photoUrl
+  return `/images/${photoUrl}`
+}
 
 interface SoldierCardProps {
   soldier: Soldier | null
@@ -25,8 +33,7 @@ export function SoldierCard({
   const { i18n } = useTranslation()
   const locale = i18n.language === 'he' ? 'he-IL' : 'en-US'
   if (!soldier) return null
-  const photoUrl = soldier.photo_url || 'placeholder-soldier.svg'
-  const src = photoUrl.startsWith('/') ? photoUrl : `/images/${photoUrl}`
+  const src = getPhotoSrc(soldier.photo_url)
   const birthFormatted = showBirthday ? formatDate(soldier.birth_date, locale) : null
   const memorialFormatted = showMemorialDay ? formatDate(soldier.memorial_date, locale) : null
   return (

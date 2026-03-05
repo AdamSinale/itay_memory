@@ -1,0 +1,70 @@
+.root {
+  height: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  background-image: url('./AddHeroPage.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.formCard {
+  aspect-ratio: 897/1535;
+  height: 90%;
+  margin: auto 0;
+  border-radius: 24px;
+  padding: 0 32px;
+  box-shadow: 0 40px 40px rgba(15, 23, 42, 0.18);
+  position: relative;
+  isolation: isolate;
+}
+
+.formCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("./Form.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.75;
+  z-index: -1;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  margin-top: 5px;
+}
+
+.formField {
+  padding: 6px;
+}
+.formFieldShortContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.formFieldShort {
+  width: 50%;
+}
+.formField label {
+  font-size: 20px;
+}
+.formField input {
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  padding: 5px 10px;
+  width: calc(100% - 20px);
+  background-color: rgba(251, 244, 243, 1);
+}
+.formField textarea{
+  border-radius: 5px;
+  height: 60px;
+  padding: 5px 10px;
+  width: calc(100% - 20px);
+  background-color: rgba(251, 244, 243, 1);
+}
+

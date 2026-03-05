@@ -33,18 +33,23 @@
 }
 
 .headerText {
-  width: 30%;
+  width: 90%;
   margin: 0 auto;
-  min-width: 300px;
+  min-width: 320px;
+  max-width: 700px;
   background: radial-gradient(
     ellipse at center,
-    rgba(250, 247, 240, 0.3) 0%,
-    rgba(250, 247, 240, 0.6) 40%,
+    rgba(250, 247, 240, 0.5) 0%,
+    rgba(250, 247, 240, 0.8) 50%,
     rgba(250, 247, 240, 0.0) 90%,
     transparent 100%
   );
   border-radius: 30px;
   padding: 10px;
+  height: calc(100% - 30px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .mainTitle {
@@ -52,6 +57,7 @@
   font-weight: 900;
   color: #1a1a1a;
   margin-bottom: 0.3rem;
+  flex-shrink: 0;
 }
 
 .subtitle {
@@ -59,11 +65,18 @@
   font-weight: 600;
   font-size: 23px;
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 .description {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   text-align: center;
+  white-space: pre-line;
+  overflow-y: auto;
+  scrollbar-width: none;
+  margin: 0;
 }
 
 .subjects {

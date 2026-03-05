@@ -3,7 +3,15 @@ import { useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSoldierById } from "../../api/http";
+import { API_URL } from "../../config";
 import styles from "./SoldierPage.module.css";
+
+function getPhotoSrc(photoUrl: string | null): string {
+  if (!photoUrl) return "/images/placeholder-soldier.svg";
+  if (photoUrl.startsWith("uploads/")) return `${API_URL}/${photoUrl}`;
+  if (photoUrl.startsWith("/")) return photoUrl;
+  return `/images/${photoUrl}`;
+}
 
 export default function SoldierPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,8 +34,7 @@ export default function SoldierPage() {
     );
   if (isError || !soldier) return <Navigate to="/" replace />;
 
-  const photoUrl = soldier.photo_url || "placeholder-soldier.svg";
-  const photoSrc = photoUrl.startsWith("/") ? photoUrl : `/images/${photoUrl}`;
+  const photoSrc = getPhotoSrc(soldier.photo_url);
 
   const birthYear = soldier.birth_date ? new Date(soldier.birth_date).getFullYear() : null;
 
