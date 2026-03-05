@@ -38,20 +38,23 @@
   margin-top: 5px;
 }
 
-.formField {
-  padding: 6px;
+.formField, .genderFormField {
+  padding: 6px 3px;
 }
+
 .formFieldShortContainer {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
 }
+
 .formFieldShort {
   width: 50%;
 }
+
 .formField label {
   font-size: 20px;
 }
+
 .formField input {
   height: 30px;
   border-radius: 5px;
@@ -60,7 +63,8 @@
   width: calc(100% - 20px);
   background-color: rgba(251, 244, 243, 1);
 }
-.formField textarea{
+
+.formField textarea {
   border-radius: 5px;
   height: 60px;
   padding: 5px 10px;
@@ -68,3 +72,43 @@
   background-color: rgba(251, 244, 243, 1);
 }
 
+.uploadImageInput {
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 8px;
+  margin: 10px 0;
+  width: fit-content;
+  background-color: rgba(251, 244, 243, 1);
+}
+
+.uploadImageInput label {
+  margin: auto 0;
+}
+.uploadImageInput button {
+  border: none;
+  background: none;
+}
+
+.submitFormButton {
+  max-width: 300px;
+  width: 80%;
+  margin: auto;
+  background-image: url("./SubmitFormButton.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  aspect-ratio: 442/83;
+  border: none;
+  border-radius: 55px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5%;
+}

@@ -4,7 +4,7 @@ import {
   Button,
   FileInput,
   Group,
-  Select,
+  SegmentedControl,
   Stack,
   Text,
   Textarea,
@@ -12,6 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
+import { IconUpload } from '@tabler/icons-react'
 import { createSoldier } from '../../api/http'
 import type { Soldier } from '../../types'
 import styles from './AddHeroPage.module.css'
@@ -36,66 +37,6 @@ export interface SharedFormFieldsProps {
   onMemorialDateChange: (date: Date | null) => void
   onGenderChange: (value: string | null) => void
   onPhotoChange: (file: File | null) => void
-}
-
-function SharedFormFields({
-  birthDate,
-  memorialDate,
-  gender,
-  photo,
-  error,
-  isValid,
-  loading,
-  onBirthDateChange,
-  onMemorialDateChange,
-  onGenderChange,
-  onPhotoChange,
-}: SharedFormFieldsProps) {
-  const { t } = useTranslation()
-  return (
-    <>
-      <Group grow className={styles.formFieldShortContainer}>
-        <TextInput
-          label={t('addHeroForm.birthDate')}
-          type="date"
-          value={birthDate ? formatDateForInput(birthDate) : ''}
-          onChange={(e) => onBirthDateChange(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
-          className={`${styles.formField} ${styles.formFieldShort}`}
-        />
-        <TextInput
-          label={t('addHeroForm.memorialDate')}
-          type="date"
-          value={memorialDate ? formatDateForInput(memorialDate) : ''}
-          onChange={(e) => onMemorialDateChange(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
-          className={`${styles.formField} ${styles.formFieldShort}`}
-        />
-      </Group>
-      <Select
-        label={t('addHeroForm.gender')}
-        placeholder={t('addHeroForm.gender')}
-        data={[
-          { value: 'male', label: t('addHeroForm.male') },
-          { value: 'female', label: t('addHeroForm.female') },
-        ]}
-        value={gender}
-        onChange={onGenderChange}
-        className={styles.formField}
-      />
-      <FileInput
-        label={t('addHeroForm.photo')}
-        placeholder={t('addHeroForm.photo')}
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        value={photo}
-        onChange={onPhotoChange}
-        clearable
-        className={styles.formField}
-      />
-      {error && <Text c="red" size="sm">{error}</Text>}
-      <Button type="submit" disabled={!isValid || loading} loading={loading}>
-        {t('addHeroForm.submit')}
-      </Button>
-    </>
-  )
 }
 
 export interface AddHeroFormProps {
@@ -132,7 +73,7 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
       const soldier = await createSoldier(formData)
       onSuccess?.(soldier)
     } catch {
-      setError(t('addHeroForm.error'))
+      setError('שגיאה בהוספת הגיבור. נסה שוב.')
     } finally {
       setLoading(false)
     }
@@ -143,12 +84,12 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
   return (
     <div className={styles.formCard} dir="rtl">
       <Title order={1} c="dark.8" className={styles.title}>
-        {t('addHeroForm.titleHe')}
+        {'הוסף גיבור'}
       </Title>
       <Box component="form" onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput
-            label={t('addHeroForm.nameHe')}
+            label={'שם החלל'}
             placeholder="e.g. איתי פריזט"
             value={nameHe}
             onChange={(e) => setNameHe(e.currentTarget.value)}
@@ -157,7 +98,7 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
           />
           <Group grow className={styles.formFieldShortContainer}>
             <TextInput
-              label={t('addHeroForm.rankHe')}
+              label={'דרגה'}
               placeholder="e.g. סמל"
               value={rankHe}
               onChange={(e) => setRankHe(e.currentTarget.value)}
@@ -165,7 +106,7 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
               className={`${styles.formField} ${styles.formFieldShort}`}
             />
             <TextInput
-              label={t('addHeroForm.unitHe')}
+              label={'יחידה'}
               placeholder="e.g. גבעתי"
               value={unitHe}
               onChange={(e) => setUnitHe(e.currentTarget.value)}
@@ -174,26 +115,51 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
             />
           </Group>
           <Textarea
-            label={t('addHeroForm.captionHe')}
-            placeholder={t('addHeroForm.captionHe')}
+            label={'ביוגרפיה'}
+            placeholder={'e.g. ביוגרפיה'}
             value={captionHe}
             onChange={(e) => setCaptionHe(e.currentTarget.value)}
             minRows={3}
             className={styles.formField}
           />
-          <SharedFormFields
-            birthDate={birthDate}
-            memorialDate={memorialDate}
-            gender={gender}
-            photo={photo}
-            error={error}
-            isValid={isValid}
-            loading={loading}
-            onBirthDateChange={setBirthDate}
-            onMemorialDateChange={setMemorialDate}
-            onGenderChange={setGender}
-            onPhotoChange={setPhoto}
+          <Group grow className={styles.formFieldShortContainer}>
+            <TextInput
+              label={'תאריך לידה'}
+              type="date"
+              value={birthDate ? formatDateForInput(birthDate) : ''}
+              onChange={(e) => setBirthDate(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
+              className={`${styles.formField} ${styles.formFieldShort}`}
+            />
+            <TextInput
+              label={'תאריך נפילה'}
+              type="date"
+              value={memorialDate ? formatDateForInput(memorialDate) : ''}
+              onChange={(e) => setMemorialDate(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
+              className={`${styles.formField} ${styles.formFieldShort}`}
+            />
+          </Group>
+          <SegmentedControl
+            data={[
+              { label: 'זכר', value: 'male' },
+              { label: 'נקבה', value: 'female' },
+            ]}
+            value={gender ?? undefined}
+            onChange={(value) => setGender(value)}
+            className={styles.genderFormField}
           />
+          <FileInput
+            label={'תמונה'}
+            placeholder={<IconUpload size={18} stroke={1.7} />}
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            value={photo}
+            onChange={setPhoto}
+            clearable
+            className={`${styles.formField} ${styles.uploadImageInput}`}
+          />
+          {error && <Text c="red" size="sm">{error}</Text>}
+          <Button type="submit" disabled={!isValid || loading} loading={loading} className={styles.submitFormButton}>
+            {'הוסף חלל'}
+          </Button>
         </Stack>
       </Box>
     </div>
@@ -201,7 +167,6 @@ export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
 }
 
 export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
-  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [nameEn, setNameEn] = useState('')
@@ -230,7 +195,7 @@ export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
       const soldier = await createSoldier(formData)
       onSuccess?.(soldier)
     } catch {
-      setError(t('addHeroForm.error'))
+      setError('Failed to add hero. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -241,12 +206,12 @@ export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
   return (
     <div className={styles.formCard}>
       <Title order={1} c="dark.8" className={styles.title}>
-        {t('addHeroForm.titleEn')}
+        {'Add your hero'}
       </Title>
       <Box component="form" onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput
-            label={t('addHeroForm.nameEn')}
+            label={'Hero\'s Name'}
             placeholder="e.g. Itay Parizat"
             value={nameEn}
             onChange={(e) => setNameEn(e.currentTarget.value)}
@@ -255,7 +220,7 @@ export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
           />
           <Group grow className={styles.formFieldShortContainer}>
             <TextInput
-              label={t('addHeroForm.rankEn')}
+              label={'Rank'}
               placeholder="e.g. Sergeant"
               value={rankEn}
               onChange={(e) => setRankEn(e.currentTarget.value)}
@@ -263,7 +228,7 @@ export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
               className={`${styles.formField} ${styles.formFieldShort}`}
             />
             <TextInput
-              label={t('addHeroForm.unitEn')}
+              label={'Unit'}
               placeholder="e.g. Givati"
               value={unitEn}
               onChange={(e) => setUnitEn(e.currentTarget.value)}
@@ -272,26 +237,51 @@ export function AddHeroFormEnglish({ onSuccess }: AddHeroFormProps) {
             />
           </Group>
           <Textarea
-            label={t('addHeroForm.captionEn')}
-            placeholder={t('addHeroForm.captionEn')}
+            label={'Biography'}
+            placeholder={'e.g. Biography'}
             value={captionEn}
             onChange={(e) => setCaptionEn(e.currentTarget.value)}
             minRows={3}
             className={styles.formField}
           />
-          <SharedFormFields
-            birthDate={birthDate}
-            memorialDate={memorialDate}
-            gender={gender}
-            photo={photo}
-            error={error}
-            isValid={isValid}
-            loading={loading}
-            onBirthDateChange={setBirthDate}
-            onMemorialDateChange={setMemorialDate}
-            onGenderChange={setGender}
-            onPhotoChange={setPhoto}
+          <Group grow className={styles.formFieldShortContainer}>
+            <TextInput
+              label={'Birth date'}
+              type="date"
+              value={birthDate ? formatDateForInput(birthDate) : ''}
+              onChange={(e) => setBirthDate(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
+              className={`${styles.formField} ${styles.formFieldShort}`}
+            />
+            <TextInput
+              label={'Memorial date'}
+              type="date"
+              value={memorialDate ? formatDateForInput(memorialDate) : ''}
+              onChange={(e) => setMemorialDate(e.currentTarget.value ? new Date(e.currentTarget.value) : null)}
+              className={`${styles.formField} ${styles.formFieldShort}`}
+            />
+          </Group>
+          <SegmentedControl
+            data={[
+              { label: 'Male', value: 'male' },
+              { label: 'Female', value: 'female' },
+            ]}
+            value={gender ?? undefined}
+            onChange={(value) => setGender(value)}
+            className={styles.genderFormField}
           />
+          <FileInput
+            label={'Photo'}
+            placeholder={<IconUpload size={18} stroke={1.7} />}
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            value={photo}
+            onChange={setPhoto}
+            clearable
+            className={`${styles.formField} ${styles.uploadImageInput}`}
+          />
+          {error && <Text c="red" size="sm">{error}</Text>}
+          <Button type="submit" disabled={!isValid || loading} loading={loading} className={styles.submitFormButton}>
+            {'Add Hero'}
+          </Button>
         </Stack>
       </Box>
     </div>

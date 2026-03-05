@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "home": "Stories of the Fallen",
+    "about": "Purpose of the Foundation"
+  },
+  "hero": {
+    "caption_fallback": "In memory of those who gave their all."
+  },
+  "about": {
+    "title": "Purpose of the Foundation",
+    "mission_fallback": "The foundation's mission is to honor the memory of the fallen and support bereaved families."
+  },
+  "donate": {
+    "title": "Support the Foundation",
+    "phone_label": "Donation by phone",
+    "donate_button": "Donate with PayPal"
+  },
+  "language": {
+    "he": "עברית",
+    "en": "English"
+  }
+}

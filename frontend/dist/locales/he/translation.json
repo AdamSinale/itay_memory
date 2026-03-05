@@ -1,0 +1,22 @@
+{
+  "nav": {
+    "home": "נוער לעיניה",
+    "about": "ערך עיה"
+  },
+  "hero": {
+    "caption_fallback": "לזכר those who gave their all."
+  },
+  "about": {
+    "title": "ערך עיה",
+    "mission_fallback": "טקסט המשימה של העמותה – לכבד את זכר הנופלים ולתמוך במשפחות השכולות."
+  },
+  "donate": {
+    "title": "תמכו בעמותה",
+    "phone_label": "תרומה בטלפון",
+    "donate_button": "תרומה באמצעות PayPal"
+  },
+  "language": {
+    "he": "עברית",
+    "en": "English"
+  }
+}
