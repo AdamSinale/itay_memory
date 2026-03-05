@@ -44,7 +44,6 @@ export interface AddHeroFormProps {
 }
 
 export function AddHeroFormHebrew({ onSuccess }: AddHeroFormProps) {
-  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [nameHe, setNameHe] = useState('')
