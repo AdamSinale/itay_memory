@@ -48,7 +48,7 @@
 
 .soldierImage {
   grid-column: 2;
-  grid-row: 1 / span 3; /* occupies intro + next row */
+  grid-row: 1 / span 3;
 }
 
 .heroImage {

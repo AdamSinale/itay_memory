@@ -17,6 +17,7 @@ from src.database import Base
 from src.entities.SoldierHe import SoldierHe
 from src.entities.SoldierEn import SoldierEn
 from src.entities.AboutPage import AboutPage
+from src.services.Soldier import create_soldier_he_sync, create_soldier_en_sync
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./memorial.db")
 if DATABASE_URL.startswith("sqlite"):
@@ -115,28 +116,30 @@ def seed(force_reseed=False):
             })
 
         for data in soldiers_data:
-            db.add(SoldierHe(
-                id=data["id"],
+            create_soldier_he_sync(
+                db,
+                soldier_id=data["id"],
                 name=data["name_he"],
                 rank=data["rank_he"],
                 unit=data["unit_he"],
-                photo_url=data["photo_url"],
-                gender=data["gender"],
                 caption=data["caption_he"],
                 birth_date=data["birth_date"],
                 memorial_date=data["memorial_date"],
-            ))
-            db.add(SoldierEn(
-                id=data["id"],
+                gender=data["gender"],
+                photo_url=data["photo_url"],
+            )
+            create_soldier_en_sync(
+                db,
+                soldier_id=data["id"],
                 name=data["name_en"],
                 rank=data["rank_en"],
                 unit=data["unit_en"],
-                photo_url=data["photo_url"],
-                gender=data["gender"],
                 caption=data["caption_en"],
                 birth_date=data["birth_date"],
                 memorial_date=data["memorial_date"],
-            ))
+                gender=data["gender"],
+                photo_url=data["photo_url"],
+            )
 
         if not db.query(AboutPage).first():
             db.add(AboutPage(

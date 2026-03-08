@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Box } from '@mantine/core'
-import { AddHeroFormHebrew, AddHeroFormEnglish } from './AddHeroForm'
+import { AddHeroForm } from './AddHeroForm'
 import styles from './AddHeroPage.module.css'
 
 export function AddHeroPage() {
@@ -8,8 +8,8 @@ export function AddHeroPage() {
 
   return (
     <Box className={styles.root}>
-      <AddHeroFormHebrew onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
-      <AddHeroFormEnglish onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
+      <AddHeroForm isHebrew={true} onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
+      <AddHeroForm isHebrew={false} onSuccess={(soldier) => navigate(`/soldier/${soldier.id}`)} />
     </Box>
   )
 }

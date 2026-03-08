@@ -166,54 +166,61 @@ async def get_all_soldiers(db: Session, lang: str = "he"):
     return await asyncio.to_thread(_get_all_soldiers_sync, db, lang)
 
 
-def _create_soldier_sync(
+def create_soldier_he_sync(
     db: Session,
     *,
     soldier_id: UUID,
-    name_he: str,
-    name_en: str,
-    rank_he: str,
-    rank_en: str,
-    unit_he: str,
-    unit_en: str,
-    caption_he: str | None,
-    caption_en: str | None,
+    name: str,
+    rank: str,
+    unit: str,
+    caption: str | None,
     birth_date: date | None,
     memorial_date: date | None,
     gender: str | None,
     photo_url: str | None,
-) -> SoldierHe:
-    """Insert a new soldier into both he and en tables. Returns the Hebrew row."""
+) -> None:
+    """Insert a new row into soldiers_he. Does not commit."""
     db.add(
         SoldierHe(
             id=soldier_id,
-            name=name_he,
-            rank=rank_he,
-            unit=unit_he,
-            caption=caption_he,
+            name=name,
+            rank=rank,
+            unit=unit,
+            caption=caption,
             birth_date=birth_date,
             memorial_date=memorial_date,
             gender=gender,
             photo_url=photo_url,
         )
     )
+
+
+def create_soldier_en_sync(
+    db: Session,
+    *,
+    soldier_id: UUID,
+    name: str,
+    rank: str,
+    unit: str,
+    caption: str | None,
+    birth_date: date | None,
+    memorial_date: date | None,
+    gender: str | None,
+    photo_url: str | None,
+) -> None:
+    """Insert a new row into soldiers_en. Does not commit."""
     db.add(
         SoldierEn(
             id=soldier_id,
-            name=name_en,
-            rank=rank_en,
-            unit=unit_en,
-            caption=caption_en,
+            name=name,
+            rank=rank,
+            unit=unit,
+            caption=caption,
             birth_date=birth_date,
             memorial_date=memorial_date,
             gender=gender,
             photo_url=photo_url,
         )
     )
-    db.commit()
-    return db.query(SoldierHe).filter(SoldierHe.id == soldier_id).first()
 
 
-async def create_soldier(db: Session, **kwargs):
-    """Create a soldier in both he and en tables."""
-    return await asyncio.to_thread(_create_soldier_sync, db, **kwargs)

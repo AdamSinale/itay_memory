@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 from src.database import get_db
 from src.schemas import SoldierSchema
 from src.services.Soldier import (
-    create_soldier,
+    create_soldier_he_sync,
+    create_soldier_en_sync,
     get_closest_bd_soldier,
     get_closest_memorial_soldier,
     get_all_soldiers,
@@ -134,44 +135,31 @@ def _save_upload(file: UploadFile) -> str | None:
 @router.post("", response_model=SoldierSchema, status_code=201)
 async def create_soldier_route(
     db: Session = Depends(get_db),
-    name_he: str = Form(..., min_length=1),
-    name_en: str = Form(..., min_length=1),
-    rank_he: str = Form(..., min_length=1),
-    rank_en: str = Form(..., min_length=1),
-    unit_he: str = Form(..., min_length=1),
-    unit_en: str = Form(..., min_length=1),
-    caption_he: str | None = Form(None),
-    caption_en: str | None = Form(None),
+    is_hebrew: bool = Query(False),
+    name: str = Form(...),
+    rank: str = Form(...),
+    unit: str = Form(...),
+    caption: str = Form(...),
     birth_date: str | None = Form(None),
     memorial_date: str | None = Form(None),
-    gender: str | None = Form(None),
+    gender: str = Form(...),
     photo: UploadFile | None = File(None),
 ):
-    """Create a new soldier with optional photo. Bilingual fields required."""
-    caption_he_val = caption_he.strip() if caption_he and caption_he.strip() else None
-    caption_en_val = caption_en.strip() if caption_en and caption_en.strip() else None
-    birth = _parse_date(birth_date)
-    memorial = _parse_date(memorial_date)
-    gender_val = gender.strip() if gender and gender.strip() else None
-    photo_url = _save_upload(photo) if photo else None
+    if not name or not rank or not unit:
+        raise HTTPException(status_code=400, detail="When name, rank and unit are required")
 
+    birth_date = _parse_date(birth_date)
+    memorial_date = _parse_date(memorial_date)
+    photo_url = _save_upload(photo) if photo else None
     soldier_id = uuid.uuid4()
-    row = await create_soldier(
-        db,
-        soldier_id=soldier_id,
-        name_he=name_he.strip(),
-        name_en=name_en.strip(),
-        rank_he=rank_he.strip(),
-        rank_en=rank_en.strip(),
-        unit_he=unit_he.strip(),
-        unit_en=unit_en.strip(),
-        caption_he=caption_he_val,
-        caption_en=caption_en_val,
-        birth_date=birth,
-        memorial_date=memorial,
-        gender=gender_val,
-        photo_url=photo_url,
-    )
+
+    create_soldier = create_soldier_he_sync if is_hebrew else create_soldier_en_sync
+    create_soldier(db, soldier_id, name, rank, unit, caption, birth_date, memorial_date, gender, photo_url)
+    db.commit()
+
+    row = await get_soldier_by_id(db, soldier_id, "he")
+    if row is None:
+        raise HTTPException(status_code=500, detail="Failed to load created soldier")
     return row
 
 

@@ -36,6 +36,15 @@
   text-align: center;
   margin-bottom: 1.5rem;
   margin-top: 5px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(250, 247, 240, 1) 0%,
+    rgba(250, 247, 240, 0.8) 60%,
+    rgba(250, 247, 240, 0.0) 80%,
+    transparent 100%
+  );
+  width: fit-content;
+  margin: 0 auto;
 }
 
 .formField, .genderFormField {
