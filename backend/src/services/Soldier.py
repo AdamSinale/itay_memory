@@ -2,13 +2,11 @@
 import asyncio
 import random
 from datetime import date
-from typing import Type
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from src.entities.SoldierHe import SoldierHe
-from src.entities.SoldierEn import SoldierEn
+from src.entities.Soldier import Soldier
 
 HERO_SOLDIER_NAME_HE = "איתי פריזט"
 HERO_SOLDIER_NAME_EN = "Itay Parizat"
@@ -16,11 +14,6 @@ HERO_SOLDIER_NAME_EN = "Itay Parizat"
 
 def _get_hero_name(lang: str) -> str:
     return HERO_SOLDIER_NAME_HE if lang == "he" else HERO_SOLDIER_NAME_EN
-
-
-def _get_soldier_model(lang: str) -> Type[SoldierHe] | Type[SoldierEn]:
-    """Return the appropriate Soldier model based on language."""
-    return SoldierHe if lang == "he" else SoldierEn
 
 
 def _days_until_next_month_day(today: date, d: date) -> int:
@@ -61,38 +54,38 @@ def _get_featured_soldiers_sync(db: Session, limit: int, lang: str):
     return result[:limit]
 
 
-def _get_soldier_by_name_sync(db: Session, name: str, lang: str):
-    """Return the soldier with the given name, or None if not found."""
-    Model = _get_soldier_model(lang)
-    return db.query(Model).filter(Model.name == name).first()
+def _get_soldier_by_name_sync(db: Session, name: str, lang: str) -> Soldier | None:
+    """Return the soldier with the given name (in name_he or name_en), or None if not found."""
+    if lang == "he":
+        return db.query(Soldier).filter(Soldier.name_he == name).first()
+    return db.query(Soldier).filter(Soldier.name_en == name).first()
 
 
-def _get_soldier_by_id_sync(db: Session, soldier_id: UUID, lang: str):
+def _get_soldier_by_id_sync(db: Session, soldier_id: UUID, lang: str) -> Soldier | None:
     """Return the soldier with the given id, or None if not found."""
-    Model = _get_soldier_model(lang)
-    return db.query(Model).filter(Model.id == soldier_id).first()
+    return db.query(Soldier).filter(Soldier.id == soldier_id).first()
 
 
-async def get_soldier_by_id(db: Session, soldier_id: UUID, lang: str = "he"):
+async def get_soldier_by_id(db: Session, soldier_id: UUID, lang: str = "he") -> Soldier | None:
     """Return the soldier with the given id, or None if not found."""
     return await asyncio.to_thread(_get_soldier_by_id_sync, db, soldier_id, lang)
 
 
-async def get_soldier_by_name(db: Session, name: str, lang: str = "he"):
+async def get_soldier_by_name(db: Session, name: str, lang: str = "he") -> Soldier | None:
     """Return the soldier with the given name, or None if not found."""
     return await asyncio.to_thread(_get_soldier_by_name_sync, db, name, lang)
 
 
 def _get_random_soldiers_sync(
     db: Session, limit: int, lang: str, exclude_ids: list[UUID] | None = None
-):
+) -> list[Soldier]:
     """Return up to `limit` soldiers chosen randomly, excluding hero and any ids in exclude_ids."""
-    Model = _get_soldier_model(lang)
     hero_name = _get_hero_name(lang)
     exclude_ids = list(exclude_ids) if exclude_ids else []
-    q = db.query(Model).filter(Model.name != hero_name)
+    name_col = Soldier.name_he if lang == "he" else Soldier.name_en
+    q = db.query(Soldier).filter(name_col != hero_name)
     if exclude_ids:
-        q = q.filter(Model.id.notin_(exclude_ids))
+        q = q.filter(Soldier.id.notin_(exclude_ids))
     candidates = list(q.all())
     if len(candidates) == 0:
         return []
@@ -103,21 +96,20 @@ def _get_random_soldiers_sync(
 
 async def get_random_soldiers(
     db: Session, limit: int = 5, lang: str = "he", exclude_ids: list[UUID] | None = None
-):
+) -> list[Soldier]:
     """Return up to `limit` soldiers chosen randomly. Excludes hero and ids in exclude_ids."""
     return await asyncio.to_thread(_get_random_soldiers_sync, db, limit, lang, exclude_ids)
 
 
-async def get_featured_soldiers(db: Session, limit: int = 5, lang: str = "he"):
+async def get_featured_soldiers(db: Session, limit: int = 5, lang: str = "he") -> list[Soldier]:
     """Return featured soldiers: first=closest birthday, last=closest memorial date, rest random."""
     return await asyncio.to_thread(_get_featured_soldiers_sync, db, limit, lang)
 
 
-def _get_closest_bd_soldier_sync(db: Session, lang: str):
+def _get_closest_bd_soldier_sync(db: Session, lang: str) -> Soldier | None:
     """Return a soldier whose birthday is closest to today (next occurrence). Random if several tie."""
-    Model = _get_soldier_model(lang)
     soldiers_with_birth = [
-        s for s in db.query(Model).filter(Model.birth_date.isnot(None)).all()
+        s for s in db.query(Soldier).filter(Soldier.birth_date.isnot(None)).all()
     ]
     if not soldiers_with_birth:
         return None
@@ -128,11 +120,10 @@ def _get_closest_bd_soldier_sync(db: Session, lang: str):
     return random.choice(closest)
 
 
-def _get_closest_memorial_soldier_sync(db: Session, lang: str):
+def _get_closest_memorial_soldier_sync(db: Session, lang: str) -> Soldier | None:
     """Return a soldier whose memorial date is closest to today (next occurrence). Random if several tie."""
-    Model = _get_soldier_model(lang)
     soldiers_with_memorial = [
-        s for s in db.query(Model).filter(Model.memorial_date.isnot(None)).all()
+        s for s in db.query(Soldier).filter(Soldier.memorial_date.isnot(None)).all()
     ]
     if not soldiers_with_memorial:
         return None
@@ -145,80 +136,53 @@ def _get_closest_memorial_soldier_sync(db: Session, lang: str):
     return random.choice(closest)
 
 
-async def get_closest_bd_soldier(db: Session, lang: str = "he"):
+async def get_closest_bd_soldier(db: Session, lang: str = "he") -> Soldier | None:
     """Return a soldier whose birthday is closest to now. Random if multiple tie."""
     return await asyncio.to_thread(_get_closest_bd_soldier_sync, db, lang)
 
 
-async def get_closest_memorial_soldier(db: Session, lang: str = "he"):
+async def get_closest_memorial_soldier(db: Session, lang: str = "he") -> Soldier | None:
     """Return a soldier whose memorial date is closest to now. Random if multiple tie."""
     return await asyncio.to_thread(_get_closest_memorial_soldier_sync, db, lang)
 
 
-def _get_all_soldiers_sync(db: Session, lang: str):
+def _get_all_soldiers_sync(db: Session, lang: str) -> list[Soldier]:
     """Return all soldiers."""
-    Model = _get_soldier_model(lang)
-    return list(db.query(Model).all())
+    return list(db.query(Soldier).all())
 
 
-async def get_all_soldiers(db: Session, lang: str = "he"):
+async def get_all_soldiers(db: Session, lang: str = "he") -> list[Soldier]:
     """Return all soldiers."""
     return await asyncio.to_thread(_get_all_soldiers_sync, db, lang)
 
 
-def create_soldier_he_sync(
+def create_soldier_sync(
     db: Session,
     soldier_id: UUID,
-    name: str,
+    name_he: str,
+    name_en: str,
+    caption_he: str | None,
+    caption_en: str | None,
     rank: str,
     unit: str,
-    caption: str | None,
     birth_date: date | None,
     memorial_date: date | None,
     gender: str | None,
     photo_url: str | None,
 ) -> None:
-    """Insert a new row into soldiers_he. Does not commit."""
+    """Insert a new row into soldiers. Does not commit."""
     db.add(
-        SoldierHe(
+        Soldier(
             id=soldier_id,
-            name=name,
+            name_he=name_he,
+            name_en=name_en,
+            caption_he=caption_he,
+            caption_en=caption_en,
             rank=rank,
             unit=unit,
-            caption=caption,
             birth_date=birth_date,
             memorial_date=memorial_date,
             gender=gender,
             photo_url=photo_url,
         )
     )
-
-
-def create_soldier_en_sync(
-    db: Session,
-    soldier_id: UUID,
-    name: str,
-    rank: str,
-    unit: str,
-    caption: str | None,
-    birth_date: date | None,
-    memorial_date: date | None,
-    gender: str | None,
-    photo_url: str | None,
-) -> None:
-    """Insert a new row into soldiers_en. Does not commit."""
-    db.add(
-        SoldierEn(
-            id=soldier_id,
-            name=name,
-            rank=rank,
-            unit=unit,
-            caption=caption,
-            birth_date=birth_date,
-            memorial_date=memorial_date,
-            gender=gender,
-            photo_url=photo_url,
-        )
-    )
-
-

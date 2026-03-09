@@ -7,8 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.database import engine, Base
-from src.entities.SoldierHe import SoldierHe
-from src.entities.SoldierEn import SoldierEn  # noqa: F401 - register tables
+from src.entities.Soldier import Soldier  # noqa: F401 - register table
 from src.routers.Soldier import router as soldiers_router
 
 

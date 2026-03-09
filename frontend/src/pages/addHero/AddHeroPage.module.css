@@ -50,6 +50,21 @@
 .formField, .genderFormField {
   padding: 6px 3px;
 }
+.hebrewInput {
+  direction: rtl;
+}
+.englishInput {
+  direction: ltr;
+}
+
+.selectInput {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  background-color: rgba(251, 244, 243, 1);
+  height: 42px;
+}
 
 .formFieldShortContainer {
   display: flex;

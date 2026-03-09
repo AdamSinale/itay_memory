@@ -2,7 +2,6 @@ import { Card, Box, Text } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import type { Soldier } from '../../types'
 import { Link } from 'react-router-dom'
-import { API_URL } from '../../config'
 import styles from './SoldierCard.module.css'
 
 interface SoldierCardProps {

@@ -8,10 +8,10 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Upload
 from sqlalchemy.orm import Session
 
 from src.database import get_db
+from src.entities.Soldier import Soldier, ALLOWED_GENDERS, ALLOWED_RANKS
 from src.schemas import SoldierSchema
 from src.services.Soldier import (
-    create_soldier_he_sync,
-    create_soldier_en_sync,
+    create_soldier_sync,
     get_closest_bd_soldier,
     get_closest_memorial_soldier,
     get_all_soldiers,
@@ -30,6 +30,22 @@ HERO_SOLDIER_NAME_HE = "איתי פריזט"
 HERO_SOLDIER_NAME_EN = "Itay Parizat"
 
 
+def _row_to_schema(row: Soldier, lang: str) -> SoldierSchema:
+    """Build API response schema from Soldier row and requested language."""
+    rank = ALLOWED_RANKS.get(row.rank, row.rank) if lang == "en" else row.rank
+    return SoldierSchema(
+        id=row.id,
+        name=row.name_he if lang == "he" else row.name_en,
+        rank=rank,
+        unit=row.unit,
+        photo_url=row.photo_url,
+        gender=row.gender,
+        caption=row.caption_he if lang == "he" else row.caption_en,
+        birth_date=row.birth_date,
+        memorial_date=row.memorial_date,
+    )
+
+
 @router.get("/hero", response_model=SoldierSchema)
 async def get_hero_soldier(
     lang: str = Query("he", pattern="^(he|en)$"),
@@ -40,7 +56,7 @@ async def get_hero_soldier(
     soldier = await get_soldier_by_name(db, hero_name, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="Soldier not found")
-    return soldier
+    return _row_to_schema(soldier, lang)
 
 
 @router.get("/featured", response_model=list[SoldierSchema])
@@ -49,7 +65,8 @@ async def get_featured_soldiers_route(
     db: Session = Depends(get_db),
 ):
     """Returns [closest birthday, 3 random, closest memorial]. Single request for the featured row."""
-    return await get_featured_soldiers(db, limit=5, lang=lang)
+    rows = await get_featured_soldiers(db, limit=5, lang=lang)
+    return [_row_to_schema(r, lang) for r in rows]
 
 
 @router.get("/random", response_model=list[SoldierSchema])
@@ -69,7 +86,8 @@ async def get_random_soldiers_route(
                     exclude_ids.append(UUID(part))
                 except ValueError:
                     pass
-    return await get_random_soldiers(db, limit=limit, lang=lang, exclude_ids=exclude_ids or None)
+    rows = await get_random_soldiers(db, limit=limit, lang=lang, exclude_ids=exclude_ids or None)
+    return [_row_to_schema(r, lang) for r in rows]
 
 
 @router.get("/closest-birthday", response_model=SoldierSchema)
@@ -81,7 +99,7 @@ async def get_closest_birthday_soldier_route(
     soldier = await get_closest_bd_soldier(db, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="No soldier with birth date found")
-    return soldier
+    return _row_to_schema(soldier, lang)
 
 
 @router.get("/closest-memorial", response_model=SoldierSchema)
@@ -93,7 +111,7 @@ async def get_closest_memorial_soldier_route(
     soldier = await get_closest_memorial_soldier(db, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="No soldier with memorial date found")
-    return soldier
+    return _row_to_schema(soldier, lang)
 
 
 @router.get("", response_model=list[SoldierSchema])
@@ -102,7 +120,8 @@ async def list_soldiers(
     db: Session = Depends(get_db),
 ):
     """Returns all soldiers."""
-    return await get_all_soldiers(db, lang)
+    rows = await get_all_soldiers(db, lang)
+    return [_row_to_schema(r, lang) for r in rows]
 
 
 def _parse_date(s: str | None) -> date | None:
@@ -135,33 +154,61 @@ def _save_upload(file: UploadFile) -> str | None:
 @router.post("", response_model=SoldierSchema, status_code=201)
 async def create_soldier_route(
     db: Session = Depends(get_db),
-    isHebrew: bool = Query(False),
-    name: str = Form(...),
+    # kept for backward-compatibility with existing frontend, but not used anymore
+    is_hebrew: bool = Query(False, alias="isHebrew"),
+    # frontend sends both languages explicitly
+    name_he: str = Form(...),
+    name_en: str = Form(...),
     rank: str = Form(...),
     unit: str = Form(...),
-    caption: str = Form(...),
+    caption_he: str | None = Form(None),
+    caption_en: str | None = Form(None),
     birth_date: str | None = Form(None),
     memorial_date: str | None = Form(None),
     gender: str = Form(...),
     photo_url: str | None = Form(None),
     photo: UploadFile | None = File(None),
 ):
-    if not name or not rank or not unit:
-        raise HTTPException(status_code=400, detail="When name, rank and unit are required")
+    # Basic required fields – both names, rank, unit
+    if not name_he or not name_en or not rank or not unit:
+        raise HTTPException(status_code=400, detail="name_he, name_en, rank and unit are required")
 
-    birth_date = _parse_date(birth_date)
-    memorial_date = _parse_date(memorial_date)
+    if gender not in ALLOWED_GENDERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"gender must be one of: {list(ALLOWED_GENDERS)}",
+        )
+    if rank not in ALLOWED_RANKS.keys():
+        raise HTTPException(
+            status_code=400,
+            detail="rank must be one of the allowed Hebrew rank values",
+        )
+
+    birth_date_parsed = _parse_date(birth_date)
+    memorial_date_parsed = _parse_date(memorial_date)
     photo_url = photo_url or (_save_upload(photo) if photo else None)
     soldier_id = uuid.uuid4()
 
-    create_soldier = create_soldier_he_sync if isHebrew else create_soldier_en_sync
-    create_soldier(db, soldier_id, name, rank, unit, caption, birth_date, memorial_date, gender, photo_url)
+    create_soldier_sync(
+        db=db,
+        soldier_id=soldier_id,
+        name_he=name_he.strip(),
+        name_en=name_en.strip(),
+        caption_he=(caption_he.strip() if caption_he and caption_he.strip() else None),
+        caption_en=(caption_en.strip() if caption_en and caption_en.strip() else None),
+        rank=rank.strip(),
+        unit=unit.strip(),
+        birth_date=birth_date_parsed,
+        memorial_date=memorial_date_parsed,
+        gender=gender,
+        photo_url=photo_url,
+    )
     db.commit()
 
     row = await get_soldier_by_id(db, soldier_id, "he")
     if row is None:
         raise HTTPException(status_code=500, detail="Failed to load created soldier")
-    return row
+    return _row_to_schema(row, "he")
 
 
 @router.get("/{soldier_id}", response_model=SoldierSchema)
@@ -174,4 +221,4 @@ async def get_soldier_by_id_route(
     soldier = await get_soldier_by_id(db, soldier_id, lang)
     if soldier is None:
         raise HTTPException(status_code=404, detail="Soldier not found")
-    return soldier
+    return _row_to_schema(soldier, lang)
