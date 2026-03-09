@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { IconUpload, IconX } from '@tabler/icons-react'
+import styles from './Dropzone.module.css'
 
 type FileWithPreview = File & { preview: string }
 
@@ -85,7 +86,7 @@ export default function Dropzone({ className = '', onPhotoUrl }: DropzoneProps) 
       {!file && (
         <div {...getRootProps({ className })}>
           <input {...getInputProps()} />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+          <div className={styles.dropzoneInner}>
             <IconUpload size={20} stroke={1.5} />
             {isDragActive ? (
               <p>Drop the file here ...</p>
