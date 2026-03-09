@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   Box,
   Button,
-  FileInput,
   Group,
   SegmentedControl,
   Stack,
@@ -11,8 +10,6 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
-import { IconUpload } from '@tabler/icons-react'
 import { createSoldier } from '../../api/http'
 import type { Soldier } from '../../types'
 import styles from './AddHeroPage.module.css'
@@ -30,14 +27,14 @@ export interface SharedFormFieldsProps {
   birthDate: Date | null
   memorialDate: Date | null
   gender: string | null
-  photo: File | null
+  photo: string | null
   error: string | null
   isValid: boolean
   loading: boolean
   onBirthDateChange: (date: Date | null) => void
   onMemorialDateChange: (date: Date | null) => void
   onGenderChange: (value: string | null) => void
-  onPhotoChange: (file: File | null) => void
+  onPhotoChange: (url: string | null) => void
 }
 
 export interface AddHeroFormProps {
@@ -55,7 +52,7 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
   const [birthDate, setBirthDate] = useState<Date | null>(null)
   const [memorialDate, setMemorialDate] = useState<Date | null>(null)
   const [gender, setGender] = useState<string>('male')
-  const [photo, setPhoto] = useState<File | null>(null)
+  const [photo, setPhoto] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,7 +66,7 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
     if (birthDate) formData.set('birth_date', formatDateForInput(birthDate))
     if (memorialDate) formData.set('memorial_date', formatDateForInput(memorialDate))
     if (gender) formData.set('gender', gender)
-    if (photo) formData.set('photo', photo)
+    if (photo) formData.set('photo_url', photo)
     try {
       const soldier = await createSoldier(formData, isHebrew)
       onSuccess?.(soldier)
@@ -83,7 +80,7 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
   const isValid = Boolean(name.trim() && rank.trim() && unit.trim())
 
   return (
-    <div className={styles.formCard} dir="rtl">
+    <div className={styles.formCard} dir={isHebrew ? "rtl" : "ltr"}>
       <Title order={1} c="dark.8" className={styles.title}>
         {isHebrew ? 'הוסף גיבור' : 'Add your hero'}
       </Title>
@@ -148,7 +145,7 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
             onChange={(value) => setGender(value)}
             className={styles.genderFormField}
           />
-          <Dropzone className='p-16 mt-10 border border-neutral-200' />
+          <Dropzone className="p-16 mt-10 border border-neutral-200" onPhotoUrl={setPhoto} />
           {error && <Text c="red" size="sm">{error}</Text>}
           <Button type="submit" disabled={!isValid || loading} loading={loading} className={styles.submitFormButton}>
             {isHebrew ? 'הוסף חלל' : 'Add your hero'}

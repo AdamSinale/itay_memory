@@ -14,10 +14,6 @@
   height: 100%;
 }
 
-.row > *:nth-child(2) {
-  margin-left: 24px;
-}
-
-.row > *:nth-last-child(2) {
-  margin-right: 24px;
+.row > *:nth-child(1), .row > *:nth-last-child(1) {
+  margin: 0 24px;
 }

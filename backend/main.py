@@ -7,9 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.database import engine, Base
-from src.entities import SoldierHe, SoldierEn, AboutPage  # noqa: F401 - register tables
+from src.entities.SoldierHe import SoldierHe
+from src.entities.SoldierEn import SoldierEn  # noqa: F401 - register tables
 from src.routers.Soldier import router as soldiers_router
-from src.routers.About import router as about_router
 
 
 @asynccontextmanager
@@ -34,7 +34,6 @@ app.add_middleware(
 )
 
 app.include_router(soldiers_router)
-app.include_router(about_router)
 
 # Serve uploaded soldier photos
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")

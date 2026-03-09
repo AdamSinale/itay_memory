@@ -16,7 +16,6 @@ from sqlalchemy.orm import sessionmaker
 from src.database import Base
 from src.entities.SoldierHe import SoldierHe
 from src.entities.SoldierEn import SoldierEn
-from src.entities.AboutPage import AboutPage
 from src.services.Soldier import create_soldier_he_sync, create_soldier_en_sync
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./memorial.db")
@@ -26,7 +25,7 @@ if DATABASE_URL.startswith("sqlite"):
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {})
 Session = sessionmaker(bind=engine)
 
-SOLDIER_COUNT = 4
+SOLDIER_COUNT = 0
 
 
 SOLDIERS_DIR = os.path.join(os.path.dirname(__file__), "soldiers")
@@ -41,9 +40,11 @@ def parse_date(date_str: str | None) -> date | None:
 
 
 def load_soldier_json(filename: str) -> dict:
+    global SOLDIER_COUNT
     """Load a soldier JSON from the soldiers/ folder."""
     path = os.path.join(SOLDIERS_DIR, filename)
     with open(path, "r", encoding="utf-8") as f:
+        SOLDIER_COUNT += 1
         return json.load(f)
 
 
@@ -70,6 +71,11 @@ def seed(force_reseed=False):
     Base.metadata.create_all(bind=engine)
     db = Session()
     try:
+        itay_data = load_soldier_json("itay_data.json")
+        shay_data = load_soldier_json("shay_data.json")
+        reuven_data = load_soldier_json("reuven_data.json")
+        shachar_data = load_soldier_json("shachar_data.json")
+
         existing_he = db.query(SoldierHe).count()
         existing_en = db.query(SoldierEn).count()
         
@@ -86,10 +92,6 @@ def seed(force_reseed=False):
             print(f"Data already exists (he={existing_he}, en={existing_en}). Run with --force to reset.")
             return
 
-        itay_data = load_soldier_json("itay_data.json")
-        shay_data = load_soldier_json("shay_data.json")
-        reuven_data = load_soldier_json("reuven_data.json")
-        shachar_data = load_soldier_json("shachar_data.json")
 
         soldiers_data = [
             soldier_json_to_row(itay_data, uuid.uuid4()),
@@ -97,23 +99,6 @@ def seed(force_reseed=False):
             soldier_json_to_row(reuven_data, uuid.uuid4()),
             soldier_json_to_row(shachar_data, uuid.uuid4()),
         ]
-
-        for i in range(SOLDIER_COUNT):
-            soldiers_data.append({
-                "id": uuid.uuid4(),
-                "name_he": f"חייל {i + 1}",
-                "name_en": f"Soldier {i + 1}",
-                "rank_he": "סמל" if i == 0 else ("טוראי" if i % 2 else "רב טוראי"),
-                "rank_en": "Sergeant" if i == 0 else ("Private" if i % 2 else "Corporal"),
-                "unit_he": f"יחידה {((i % 3) + 1)}",
-                "unit_en": f"Unit {((i % 3) + 1)}",
-                "photo_url": None,
-                "gender": "male" if i % 3 != 1 else "female",
-                "caption_he": "לזכר נופלים שניצלו את חייהם בשביל ישראל." if i == 0 else None,
-                "caption_en": "In memory of those who gave their all." if i == 0 else None,
-                "birth_date": date(1990 + (i % 10), (i % 12) + 1, (i % 28) + 1),
-                "memorial_date": date(2023 + (i % 2), (i % 12) + 1, (i % 28) + 1),
-            })
 
         for data in soldiers_data:
             create_soldier_he_sync(
@@ -141,13 +126,6 @@ def seed(force_reseed=False):
                 photo_url=data["photo_url"],
             )
 
-        if not db.query(AboutPage).first():
-            db.add(AboutPage(
-                id=uuid.uuid4(),
-                mission_text_he="טקסט המשימה של העמותה – לכבד את זכר הנופלים ולתמוך במשפחות השכולות.",
-                mission_text_en="The foundation's mission is to honor the memory of the fallen and support bereaved families.",
-                donation_phone="+972-2-1234567",
-            ))
 
         db.commit()
         print(f"Seed completed: {len(soldiers_data)} soldiers in each table (he + en).")

@@ -135,7 +135,7 @@ def _save_upload(file: UploadFile) -> str | None:
 @router.post("", response_model=SoldierSchema, status_code=201)
 async def create_soldier_route(
     db: Session = Depends(get_db),
-    is_hebrew: bool = Query(False),
+    isHebrew: bool = Query(False),
     name: str = Form(...),
     rank: str = Form(...),
     unit: str = Form(...),
@@ -143,6 +143,7 @@ async def create_soldier_route(
     birth_date: str | None = Form(None),
     memorial_date: str | None = Form(None),
     gender: str = Form(...),
+    photo_url: str | None = Form(None),
     photo: UploadFile | None = File(None),
 ):
     if not name or not rank or not unit:
@@ -150,10 +151,10 @@ async def create_soldier_route(
 
     birth_date = _parse_date(birth_date)
     memorial_date = _parse_date(memorial_date)
-    photo_url = _save_upload(photo) if photo else None
+    photo_url = photo_url or (_save_upload(photo) if photo else None)
     soldier_id = uuid.uuid4()
 
-    create_soldier = create_soldier_he_sync if is_hebrew else create_soldier_en_sync
+    create_soldier = create_soldier_he_sync if isHebrew else create_soldier_en_sync
     create_soldier(db, soldier_id, name, rank, unit, caption, birth_date, memorial_date, gender, photo_url)
     db.commit()
 

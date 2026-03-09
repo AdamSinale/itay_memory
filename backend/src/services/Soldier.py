@@ -168,7 +168,6 @@ async def get_all_soldiers(db: Session, lang: str = "he"):
 
 def create_soldier_he_sync(
     db: Session,
-    *,
     soldier_id: UUID,
     name: str,
     rank: str,
@@ -197,7 +196,6 @@ def create_soldier_he_sync(
 
 def create_soldier_en_sync(
     db: Session,
-    *,
     soldier_id: UUID,
     name: str,
     rank: str,

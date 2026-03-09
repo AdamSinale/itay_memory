@@ -6,13 +6,6 @@ import { getSoldierById } from "../../api/http";
 import { API_URL } from "../../config";
 import styles from "./SoldierPage.module.css";
 
-function getPhotoSrc(photoUrl: string | null): string {
-  if (!photoUrl) return "/images/placeholder-soldier.svg";
-  if (photoUrl.startsWith("uploads/")) return `${API_URL}/${photoUrl}`;
-  if (photoUrl.startsWith("/")) return photoUrl;
-  return `/images/${photoUrl}`;
-}
-
 export default function SoldierPage() {
   const { id } = useParams<{ id: string }>();
   const { i18n } = useTranslation();
@@ -34,7 +27,6 @@ export default function SoldierPage() {
     );
   if (isError || !soldier) return <Navigate to="/" replace />;
 
-  const photoSrc = getPhotoSrc(soldier.photo_url);
 
   const birthYear = soldier.birth_date ? new Date(soldier.birth_date).getFullYear() : null;
 
@@ -68,7 +60,7 @@ export default function SoldierPage() {
         </div>
 
         <div className={styles.soldierImage}>
-          <img src={photoSrc} alt={soldier.name} className={styles.heroImage} />
+          <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
         </div>
 
         <div className={styles.soldierBio}>

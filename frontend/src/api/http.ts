@@ -71,13 +71,6 @@ export async function getSoldierById(id: string, lang: string = 'he'): Promise<S
 }
 
 export async function createSoldier(formData: FormData, isHebrew: boolean): Promise<Soldier> {
-  console.log(formData.get('name'))
-  console.log(formData.get('rank'))
-  console.log(formData.get('unit'))
-  console.log(formData.get('birth_date'))
-  console.log(formData.get('memorial_date'))
-  console.log(formData.get('gender'))
-  console.log(formData.get('photo'))
   const res = await axios.post<Soldier>(`${http.defaults.baseURL}/soldiers?isHebrew=${isHebrew}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
