@@ -1,12 +1,29 @@
 """Soldier business logic."""
 import asyncio
 import random
+from dataclasses import dataclass
 from datetime import date
 from uuid import UUID
 
+from sqlalchemy import extract, or_
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 
 from src.entities.Soldier import Soldier
+
+
+@dataclass
+class SoldierListFilters:
+    """Optional filters for GET /soldiers."""
+
+    name: str | None = None
+    gender: str | None = None
+    age_min: int | None = None
+    age_max: int | None = None
+    memorial_from: date | None = None
+    memorial_to: date | None = None
+    rank: str | None = None
+    unit: str | None = None
 
 HERO_SOLDIER_NAME_HE = "איתי פריזט"
 HERO_SOLDIER_NAME_EN = "Itay Parizat"
@@ -146,14 +163,46 @@ async def get_closest_memorial_soldier(db: Session, lang: str = "he") -> Soldier
     return await asyncio.to_thread(_get_closest_memorial_soldier_sync, db, lang)
 
 
+def _list_soldiers_sync(db: Session, filters: SoldierListFilters | None) -> list[Soldier]:
+    """Return soldiers ordered by Hebrew name, optionally filtered."""
+    q = db.query(Soldier)
+    if filters is not None:
+        if filters.name:
+            term = f"%{filters.name.strip()}%"
+            q = q.filter(or_(Soldier.name_he.ilike(term), Soldier.name_en.ilike(term)))
+        if filters.gender:
+            q = q.filter(Soldier.gender == filters.gender)
+        if filters.memorial_from is not None:
+            q = q.filter(Soldier.memorial_date >= filters.memorial_from)
+        if filters.memorial_to is not None:
+            q = q.filter(Soldier.memorial_date <= filters.memorial_to)
+        if filters.rank:
+            q = q.filter(Soldier.rank == filters.rank)
+        if filters.unit:
+            q = q.filter(Soldier.unit.ilike(f"%{filters.unit.strip()}%"))
+        if filters.age_min is not None or filters.age_max is not None:
+            q = q.filter(Soldier.memorial_date.isnot(None), Soldier.birth_date.isnot(None))
+            age_years = extract("year", func.age(Soldier.memorial_date, Soldier.birth_date))
+            if filters.age_min is not None:
+                q = q.filter(age_years >= filters.age_min)
+            if filters.age_max is not None:
+                q = q.filter(age_years <= filters.age_max)
+    return list(q.order_by(Soldier.name_he.asc()).all())
+
+
 def _get_all_soldiers_sync(db: Session, lang: str) -> list[Soldier]:
     """Return all soldiers."""
-    return list(db.query(Soldier).all())
+    return _list_soldiers_sync(db, None)
 
 
 async def get_all_soldiers(db: Session, lang: str = "he") -> list[Soldier]:
     """Return all soldiers."""
     return await asyncio.to_thread(_get_all_soldiers_sync, db, lang)
+
+
+async def search_soldiers(db: Session, filters: SoldierListFilters) -> list[Soldier]:
+    """Return soldiers matching filters (same row shape as list all)."""
+    return await asyncio.to_thread(_list_soldiers_sync, db, filters)
 
 
 def create_soldier_sync(

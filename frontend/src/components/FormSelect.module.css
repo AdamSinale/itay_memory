@@ -1,0 +1,31 @@
+.wrap {
+  padding: 6px 3px;
+}
+
+.wrapForm .label {
+  display: block;
+  font-size: 20px;
+}
+
+.wrapCompact .label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--mantine-color-dark-8, #1a1b1e);
+}
+
+.select {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  background-color: rgba(251, 244, 243, 1);
+  height: 42px;
+  font: inherit;
+}
+
+.select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

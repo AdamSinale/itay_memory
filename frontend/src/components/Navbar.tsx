@@ -26,6 +26,7 @@ export function AppNavbar() {
 
   const navItems = [
     { to: '/', label: i18n.t('nav.home') },
+    { to: '/search', label: i18n.t('nav.search') },
     { to: '/about', label: i18n.t('nav.about') },
     { to: '/add-hero', label: i18n.t('nav.addHero') },
   ]

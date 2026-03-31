@@ -31,7 +31,7 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background-size: cover;
-  background-position: center;
+  background-position: top center;
   border: 1px solid #b8962e;
   flex-shrink: 0;
 }

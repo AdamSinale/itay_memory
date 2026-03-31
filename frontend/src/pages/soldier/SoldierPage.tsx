@@ -3,7 +3,6 @@ import { useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSoldierById } from "../../api/http";
-import { API_URL } from "../../config";
 import styles from "./SoldierPage.module.css";
 
 export default function SoldierPage() {

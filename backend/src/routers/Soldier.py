@@ -11,14 +11,15 @@ from src.database import get_db
 from src.entities.Soldier import Soldier, ALLOWED_GENDERS, ALLOWED_RANKS
 from src.schemas import SoldierSchema
 from src.services.Soldier import (
+    SoldierListFilters,
     create_soldier_sync,
     get_closest_bd_soldier,
     get_closest_memorial_soldier,
-    get_all_soldiers,
     get_featured_soldiers,
     get_random_soldiers,
     get_soldier_by_name,
     get_soldier_by_id,
+    search_soldiers,
 )
 
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads")
@@ -28,6 +29,19 @@ router = APIRouter(prefix="/soldiers", tags=["soldiers"])
 
 HERO_SOLDIER_NAME_HE = "איתי פריזט"
 HERO_SOLDIER_NAME_EN = "Itay Parizat"
+
+
+def _normalize_rank_filter(rank: str | None) -> str | None:
+    """Map rank query to stored Hebrew rank; accepts Hebrew key or English label."""
+    if not rank or not rank.strip():
+        return None
+    r = rank.strip()
+    if r in ALLOWED_RANKS:
+        return r
+    for k, en_label in ALLOWED_RANKS.items():
+        if en_label == r:
+            return k
+    return r
 
 
 def _row_to_schema(row: Soldier, lang: str) -> SoldierSchema:
@@ -118,9 +132,34 @@ async def get_closest_memorial_soldier_route(
 async def list_soldiers(
     lang: str = Query("he", pattern="^(he|en)$"),
     db: Session = Depends(get_db),
+    name: str | None = Query(None, description="Substring match on Hebrew or English name"),
+    gender: str | None = Query(None),
+    age_min: int | None = Query(None, ge=0, le=130),
+    age_max: int | None = Query(None, ge=0, le=130),
+    memorial_from: date | None = Query(None),
+    memorial_to: date | None = Query(None),
+    rank: str | None = Query(None, description="Rank: Hebrew key as stored, or English label if lang=en"),
+    unit: str | None = Query(None, description="Substring match on unit"),
 ):
-    """Returns all soldiers."""
-    rows = await get_all_soldiers(db, lang)
+    """Returns all soldiers, optionally filtered."""
+    if gender is not None and gender.strip() and gender.strip() not in ALLOWED_GENDERS:
+        raise HTTPException(status_code=400, detail="Invalid gender")
+    if age_min is not None and age_max is not None and age_min > age_max:
+        raise HTTPException(status_code=400, detail="age_min must be <= age_max")
+    if memorial_from is not None and memorial_to is not None and memorial_from > memorial_to:
+        raise HTTPException(status_code=400, detail="memorial_from must be <= memorial_to")
+
+    filters = SoldierListFilters(
+        name=name.strip() if name and name.strip() else None,
+        gender=gender.strip() if gender and gender.strip() else None,
+        age_min=age_min,
+        age_max=age_max,
+        memorial_from=memorial_from,
+        memorial_to=memorial_to,
+        rank=_normalize_rank_filter(rank),
+        unit=unit.strip() if unit and unit.strip() else None,
+    )
+    rows = await search_soldiers(db, filters)
     return [_row_to_schema(r, lang) for r in rows]
 
 

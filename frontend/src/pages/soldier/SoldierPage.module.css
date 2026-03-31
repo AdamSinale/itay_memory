@@ -52,10 +52,13 @@
 }
 
 .heroImage {
+  width: 100%;
   min-height: 500px;
   max-height: 90vh;
   display: block;
   border-radius: 12px;
+  object-fit: cover;
+  object-position: top center;
 }
 
 .soldierBio {

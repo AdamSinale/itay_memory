@@ -1,0 +1,40 @@
+.root {
+  padding-bottom: 3rem;
+  background: linear-gradient(180deg, #fdf9e7 0%, #fffef9 40%, #fdf9e7 100%);
+  min-height: calc(100vh - 72px);
+}
+
+.headerRow {
+  width: 100%;
+}
+
+.pageTitle {
+  flex: 1;
+  min-width: min(100%, 280px);
+}
+
+.filters,
+.sortPanel {
+  background-color: rgba(255, 254, 249, 0.95);
+  border: 1px solid #b8962e;
+  box-shadow: 0 4px 16px rgba(184, 150, 46, 0.1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--mantine-spacing-lg, 1.25rem);
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.cardWrap {
+  display: flex;
+  justify-content: stretch;
+  min-width: 0;
+}
+
+.cardWrap :global(.mantine-Card-root) {
+  width: 100%;
+  max-width: none;
+}

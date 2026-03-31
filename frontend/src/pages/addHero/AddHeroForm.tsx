@@ -14,6 +14,8 @@ import { createSoldier } from '../../api/http'
 import type { Soldier } from '../../types'
 import styles from './AddHeroPage.module.css'
 import Dropzone from '../../components/Dropzone'
+import { FormSelect } from '../../components/FormSelect'
+import { RANK_OPTIONS } from '../../constants/ranks'
 
 function formatDateForInput(d: Date | null): string {
   if (!d) return ''
@@ -22,35 +24,6 @@ function formatDateForInput(d: Date | null): string {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
-
-// Rank options: value is Hebrew (submitted to API), label shown by form language
-const RANK_OPTIONS: { value: string; labelHe: string; labelEn: string }[] = [
-  { value: 'טוראי (טור׳)', labelHe: 'טוראי (טור׳)', labelEn: 'Private' },
-  { value: 'טוראי ראשון (טר״ש)', labelHe: 'טוראי ראשון (טר״ש)', labelEn: 'Lance Corporal' },
-  { value: 'רב טוראי (רב״ט)', labelHe: 'רב טוראי (רב״ט)', labelEn: 'Corporal' },
-  { value: 'סמל (סמ״ל)', labelHe: 'סמל (סמ״ל)', labelEn: 'Sergeant' },
-  { value: 'סמל ראשון (סמ״ר)', labelHe: 'סמל ראשון (סמ״ר)', labelEn: 'First Sergeant' },
-  { value: 'רב סמל (רס״ל)', labelHe: 'רב סמל (רס״ל)', labelEn: 'Master Sergeant' },
-  { value: 'רב סמל ראשון (רס״ר)', labelHe: 'רב סמל ראשון (רס״ר)', labelEn: 'Sergeant First Class' },
-  { value: 'רב סמל מתקדם (רס״מ)', labelHe: 'רב סמל מתקדם (רס״מ)', labelEn: 'Advanced Sergeant Major' },
-  { value: 'רב סמל בכיר (רס״ב)', labelHe: 'רב סמל בכיר (רס״ב)', labelEn: 'Senior Sergeant Major' },
-  { value: 'רב סמל ראשון בכיר (רס״ב״ר)', labelHe: 'רב סמל ראשון בכיר (רס״ב״ר)', labelEn: 'Senior First Sergeant' },
-  { value: 'סגן משנה (סג״מ)', labelHe: 'סגן משנה (סג״מ)', labelEn: 'Second Lieutenant' },
-  { value: 'סגן (סג״ן)', labelHe: 'סגן (סג״ן)', labelEn: 'Lieutenant' },
-  { value: 'סרן (סרן)', labelHe: 'סרן (סרן)', labelEn: 'Captain' },
-  { value: 'רב סרן (רס״ן)', labelHe: 'רב סרן (רס״ן)', labelEn: 'Major' },
-  { value: 'סגן אלוף (סא״ל)', labelHe: 'סגן אלוף (סא״ל)', labelEn: 'Lieutenant Colonel' },
-  { value: 'אלוף משנה (אל״ם)', labelHe: 'אלוף משנה (אל״ם)', labelEn: 'Colonel' },
-  { value: 'תת אלוף (תא״ל)', labelHe: 'תת אלוף (תא״ל)', labelEn: 'Brigadier General' },
-  { value: 'אלוף (אלוף)', labelHe: 'אלוף (אלוף)', labelEn: 'Major General' },
-  { value: 'רב אלוף (רא״ל)', labelHe: 'רב אלוף (רא״ל)', labelEn: 'Lieutenant General' },
-  { value: 'קצין מקצועי אקדמאי (קמ״א)', labelHe: 'קצין מקצועי אקדמאי (קמ״א)', labelEn: 'Academic Professional Officer' },
-  { value: 'קצין אקדמאי בכיר (קא״ב)', labelHe: 'קצין אקדמאי בכיר (קא״ב)', labelEn: 'Senior Academic Officer' },
-  { value: 'קצין מקצועי שיניים (קמ״ש)', labelHe: 'קצין מקצועי שיניים (קמ״ש)', labelEn: 'Dental Professional Officer' },
-  { value: 'רבץ (רב״ץ)', labelHe: 'רבץ (רב״ץ)', labelEn: 'Quartermaster' },
-  { value: 'קרפ (קר״פ)', labelHe: 'קרפ (קר״פ)', labelEn: 'Corps Quartermaster' },
-  { value: 'קצין אקדמאי מיוחד (קא״ם)', labelHe: 'קצין אקדמאי מיוחד (קא״ם)', labelEn: 'Special Academic Officer' },
-]
 
 export interface SharedFormFieldsProps {
   birthDate: Date | null
@@ -138,24 +111,19 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
           />
           </Group>
           <Group grow className={styles.formFieldShortContainer}>
-            <div className={`${styles.formField} ${styles.formFieldShort}`}>
-              <label>
-                {isHebrew ? 'דרגה' : 'Rank'}
-              </label>
-              <select
-                value={rank}
-                onChange={(e) => setRank(e.currentTarget.value)}
-                required
-                className={styles.selectInput}
-              >
-                <option value="">{isHebrew ? 'בחר דרגה' : 'Select rank'}</option>
-                {RANK_OPTIONS.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {isHebrew ? r.labelHe : r.labelEn}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <FormSelect
+              variant="form"
+              className={styles.formFieldShort}
+              label={isHebrew ? 'דרגה' : 'Rank'}
+              value={rank}
+              onChange={setRank}
+              placeholder={isHebrew ? 'בחר דרגה' : 'Select rank'}
+              required
+              options={RANK_OPTIONS.map((r) => ({
+                value: r.value,
+                label: isHebrew ? r.labelHe : r.labelEn,
+              }))}
+            />
             <TextInput
               label={isHebrew ? 'יחידה' : 'Unit'}
               placeholder={isHebrew ? 'e.g. גבעתי' : 'e.g. Givati'}
