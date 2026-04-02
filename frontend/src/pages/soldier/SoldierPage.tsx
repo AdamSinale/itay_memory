@@ -41,41 +41,43 @@ export default function SoldierPage() {
   const paragraphs = bio ? bio.split("\n").filter(Boolean) : [];
 
   return (
-    <Container size="lg" className={styles.pageContent}>
-      <div className={styles.heroGrid}>
-        <div className={styles.soldierName}>
-          <Title>{soldier.name} {isHe ? 'ז"ל' : "R.I.P"}</Title>
-        </div>
-        
-        <div className={styles.soldierBasicInfo}>
-          <Text mt="sm">
-            {birthYear != null && <>{isHe ? "נולד בשנת" : "Born in"} {birthYear}</>}
-            {birthYear != null && memorialDate && <br />}
-            {memorialDate != null && <>{isHe ? "נפל ב־" : "Fell on "}{memorialDate}</>}
-            {(birthYear != null || memorialDate != null) && <br />}
-            {soldier.rank}
-            {soldier.unit && (isHe ? ` ב${soldier.unit}` : `, ${soldier.unit}`)}
-          </Text>
-        </div>
+    <div className={styles.pageContainer}>
+      <Container size="lg" className={styles.pageContent}>
+        <div className={styles.heroGrid}>
+          <div className={styles.soldierName}>
+            <Title>{soldier.name} {isHe ? 'ז"ל' : "R.I.P"}</Title>
+          </div>
 
-        <div className={styles.soldierImage}>
-          <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
-        </div>
+          <div className={styles.soldierBasicInfo}>
+            <Text mt="sm">
+              {birthYear != null && <>{isHe ? "נולד בשנת" : "Born in"} {birthYear}</>}
+              {birthYear != null && memorialDate && <br />}
+              {memorialDate != null && <>{isHe ? "נפל ב־" : "Fell on "}{memorialDate}</>}
+              {(birthYear != null || memorialDate != null) && <br />}
+              {soldier.rank}
+              {soldier.unit && (isHe ? ` ב${soldier.unit}` : `, ${soldier.unit}`)}
+            </Text>
+          </div>
 
-        <div className={styles.soldierBio}>
-          <div className={`${styles.soldierBioContent} ${isHe ? styles.soldierBioContentRtl : styles.soldierBioContentLtr}`}>
-            {paragraphs.length > 0 ? (
-              paragraphs.map((p, i) => (
-                <Text key={i} mb="sm">
-                  {p}
-                </Text>
-              ))
-            ) : (
-              <Text c="dimmed">{isHe ? "אין ביוגרפיה זמינה." : "No biography available."}</Text>
-            )}
+          <div className={styles.soldierImage}>
+            <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
+          </div>
+
+          <div className={styles.soldierBio}>
+            <div className={`${styles.soldierBioContent} ${isHe ? styles.soldierBioContentRtl : styles.soldierBioContentLtr}`}>
+              {paragraphs.length > 0 ? (
+                paragraphs.map((p, i) => (
+                  <Text key={i} mb="sm">
+                    {p}
+                  </Text>
+                ))
+              ) : (
+                <Text c="dimmed">{isHe ? "אין ביוגרפיה זמינה." : "No biography available."}</Text>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </div>
   );
 }

@@ -10,6 +10,6 @@ html, body {
 
 .app-shell-main {
   background-color: transparent;
-  height: calc(100vh - 45px);
+  height: calc(100vh - 53px);
   padding: 0;
 }
