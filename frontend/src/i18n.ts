@@ -4,7 +4,16 @@ import { initReactI18next } from 'react-i18next'
 const resources = {
   en: {
     translation: {
-      nav: { home: 'Home', search: 'Search', about: 'About', donate: 'Donate', addHero: 'Add your hero' },
+      nav: {
+        home: 'Home',
+        search: 'Search',
+        about: 'About',
+        donate: 'Donate',
+        addHero: 'Add your hero',
+        menu: 'Menu',
+        openMenu: 'Open navigation menu',
+        closeMenu: 'Close menu',
+      },
       search: {
         title: 'Search the fallen',
         name: 'Name',
@@ -46,7 +55,16 @@ const resources = {
   },
   he: {
     translation: {
-      nav: { home: 'בית', search: 'חיפוש', about: 'אודות', donate: 'תרומה', addHero: 'הוסף גיבור' },
+      nav: {
+        home: 'בית',
+        search: 'חיפוש',
+        about: 'אודות',
+        donate: 'תרומה',
+        addHero: 'הוסף גיבור',
+        menu: 'תפריט',
+        openMenu: 'פתח תפריט ניווט',
+        closeMenu: 'סגור תפריט',
+      },
       search: {
         title: 'חיפוש חללים',
         name: 'שם',

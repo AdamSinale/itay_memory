@@ -41,7 +41,7 @@ export default function SoldierPage() {
   const paragraphs = bio ? bio.split("\n").filter(Boolean) : [];
 
   return (
-    <div className={styles.pageContainer}>
+    <div className={`${styles.pageContainer} ${isHe ? styles.pageHebrew : ''}`.trim()}>
       <Container size="lg" className={styles.pageContent}>
         <div className={styles.heroGrid}>
           <div className={styles.soldierName}>
@@ -59,10 +59,6 @@ export default function SoldierPage() {
             </Text>
           </div>
 
-          <div className={styles.soldierImage}>
-            <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
-          </div>
-
           <div className={styles.soldierBio}>
             <div className={`${styles.soldierBioContent} ${isHe ? styles.soldierBioContentRtl : styles.soldierBioContentLtr}`}>
               {paragraphs.length > 0 ? (
@@ -77,6 +73,9 @@ export default function SoldierPage() {
             </div>
           </div>
         </div>
+          <div className={styles.soldierImage}>
+            <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
+          </div>
       </Container>
     </div>
   );

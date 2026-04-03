@@ -41,6 +41,187 @@
   background-color: rgba(184, 150, 46, 0.18);
 }
 
+/* >700px: horizontal nav; ≤700px: hamburger + drawer (see media query below) */
 .navLinks {
+  display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+/* Plain three-bar control (avoids Mantine Burger + flex/pseudo-element clashes) */
+.menuToggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 5px;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.45rem;
+  margin: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: #5e4913;
+  flex-shrink: 0;
+}
+
+.menuToggle:hover {
+  background-color: rgba(184, 150, 46, 0.12);
+}
+
+.menuToggle:focus-visible {
+  outline: 2px solid #b8962e;
+  outline-offset: 2px;
+}
+
+.menuToggleLine {
+  display: block;
+  height: 3px;
+  width: 100%;
+  border-radius: 2px;
+  background-color: currentColor;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: center;
+}
+
+.menuToggle[data-opened] .menuToggleLine:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.menuToggle[data-opened] .menuToggleLine:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.menuToggle[data-opened] .menuToggleLine:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+@media (max-width: 700px) {
+  .navLinks {
+    display: none !important;
+  }
+
+  .menuToggle {
+    display: flex;
+  }
+}
+
+/* Custom mobile menu (no @mantine/core/styles.css — avoids global reset) */
+.mobileMenuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: rgba(52, 44, 28, 0.45);
+}
+
+.mobileMenuPanel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 201;
+  width: min(20rem, 88vw);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 1.25rem;
+  background-color: rgba(250, 247, 240, 0.98);
+  box-shadow: 0 0 32px rgba(94, 73, 19, 0.18);
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+.mobileMenuPanelStart {
+  left: 0;
+  border-right: 1px solid #b8962e;
+  animation-name: mobileMenuSlideFromStart;
+}
+
+.mobileMenuPanelEnd {
+  right: 0;
+  border-left: 1px solid #b8962e;
+  animation-name: mobileMenuSlideFromEnd;
+}
+
+@keyframes mobileMenuSlideFromStart {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes mobileMenuSlideFromEnd {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.mobileMenuHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(184, 150, 46, 0.35);
+}
+
+.mobileMenuTitle {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #5e4913;
+}
+
+.mobileMenuClose {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #5e4913;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobileMenuClose:hover {
+  background-color: rgba(184, 150, 46, 0.12);
+}
+
+.mobileMenuClose:focus-visible {
+  outline: 2px solid #b8962e;
+  outline-offset: 2px;
+}
+
+.mobileMenuNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.mobileNavLink {
+  display: block;
+  width: calc(100% - 28px);
+  text-align: start;
+  padding: 12px 14px;
+  border-radius: 8px;
 }
