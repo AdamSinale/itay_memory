@@ -1,8 +1,12 @@
+.root {
+  height: 100%;
+}
+
 .articleHeader {
   display: grid;
   grid-template-rows: 70% 30%;
-  height: calc(100svh - 45px);
   position: relative;
+  height: 100%;
 }
 
 .headerContent {

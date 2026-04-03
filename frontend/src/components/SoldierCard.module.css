@@ -1,0 +1,66 @@
+.card {
+  flex: 1 1 0;
+  min-width: 120px;
+  box-shadow: 0 4px 16px rgba(184, 150, 46, 0.12);
+  text-align: center;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+}
+
+.link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+}
+
+.photoContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.framePhoto,
+.soldierPhoto,
+.framePhotoBG {
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  aspect-ratio: 1;
+  background-position: top center;
+  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.framePhotoBG {
+  background-image: url('./SoldierConBG.png');
+  z-index: 1;
+}
+
+.soldierPhoto {
+  z-index: 2;
+  border-radius: 500px;
+  width: 80%;
+  margin: auto;
+}
+
+.framePhoto {
+  background-image: url('./SoldierCon.png');
+  z-index: 3;
+  width: 100%;
+}
+
+.infoContainer {
+  background: radial-gradient(ellipse at center, rgba(250, 247, 240, 0.5) 0%, rgba(250, 247, 240, 0.8) 44%, rgba(250, 247, 240, 0.0) 73%, transparent 100%);
+  width: fit-content;
+  margin: auto;
+  padding: 10px 20px;
+}

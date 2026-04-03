@@ -3,7 +3,10 @@ import { useParams, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getSoldierById } from "../../api/http";
+import { SoldierCard } from '../../components/SoldierCard'
 import styles from "./SoldierPage.module.css";
+
+import Underline from "./Underline.webp";
 
 export default function SoldierPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,10 +47,16 @@ export default function SoldierPage() {
     <div className={`${styles.pageContainer} ${isHe ? styles.pageHebrew : ''}`.trim()}>
       <Container size="lg" className={styles.pageContent}>
         <div className={styles.heroGrid}>
-          <div className={styles.soldierName}>
-            <Title>{soldier.name} {isHe ? 'ז"ל' : "R.I.P"}</Title>
+          <div className={styles.soldierImage}>
+            <SoldierCard
+              key={soldier.id}
+              soldier={soldier}
+            />
           </div>
-
+          <div className={styles.soldierName}>
+            <Title>{soldier.name}</Title>
+          </div>
+          <img src={Underline} className={styles.underline} />
           <div className={styles.soldierBasicInfo}>
             <Text mt="sm">
               {birthYear != null && <>{isHe ? "נולד בשנת" : "Born in"} {birthYear}</>}
@@ -73,9 +82,6 @@ export default function SoldierPage() {
             </div>
           </div>
         </div>
-          <div className={styles.soldierImage}>
-            <img src={soldier.photo_url ?? "/images/placeholder-soldier.svg"} alt={soldier.name} className={styles.heroImage} />
-          </div>
       </Container>
     </div>
   );

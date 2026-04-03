@@ -27,7 +27,7 @@ import { RANK_OPTIONS } from '../../constants/ranks'
 import type { Soldier } from '../../types'
 import { sortSoldiers, type SortField } from '../../utils/soldierSort'
 import { FormSelect } from '../../components/FormSelect'
-import { SoldierCard } from '../home/SoldierCard'
+import { SoldierCard } from '../../components/SoldierCard'
 import styles from './SearchPage.module.css'
 
 export function SearchPage() {

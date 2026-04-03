@@ -9,7 +9,7 @@ import {
   getClosestMemorialSoldier,
   getRandomSoldiers,
 } from '../../api/http'
-import { SoldierCard } from './SoldierCard'
+import { SoldierCard } from '../../components/SoldierCard'
 import { FeaturedSoldiersRow } from './FeaturedSoldiersRow'
 import { HomeSectionHeader } from './HomeSectionHeader'
 import styles from './HomePage.module.css'

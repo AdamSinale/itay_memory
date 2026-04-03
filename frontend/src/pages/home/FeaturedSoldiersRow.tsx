@@ -1,6 +1,6 @@
 import { Box } from '@mantine/core'
 import type { Soldier } from '../../types'
-import { SoldierCard } from './SoldierCard'
+import { SoldierCard } from '../../components/SoldierCard'
 import styles from './FeaturedSoldiersRow.module.css'
 
 interface FeaturedSoldiersRowProps {
