@@ -64,3 +64,14 @@
   margin: auto;
   padding: 10px 20px;
 }
+
+@media (max-width: 800px) {
+  .card {
+    display: inline-block;
+    width: 40%;
+    margin: 0 !important;
+  }
+  .metaText {
+    display: none;
+  }
+}
