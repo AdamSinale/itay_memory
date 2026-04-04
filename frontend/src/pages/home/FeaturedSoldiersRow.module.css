@@ -25,6 +25,6 @@
     display: block;
   }
   .row {
-    display: block;
+    gap: 0;
   }
 }

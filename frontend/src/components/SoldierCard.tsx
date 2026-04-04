@@ -42,18 +42,20 @@ export function SoldierCard({
           <br />
           <span>{soldier.name}</span>
         </Text>
+        {birthFormatted && (
         <Text fw={600} lineClamp={1} className={styles.metaText}>
-          {birthFormatted && `${isHebrew ? 'יום הולדת' : 'Birthday'}:`}
+          {isHebrew ? 'יום הולדת' : 'Birthday'}:
+          <br />
+          {birthFormatted}
         </Text>
+        )}
+        {memorialFormatted && (
         <Text fw={600} lineClamp={1} className={styles.metaText}>
-          {birthFormatted && birthFormatted}
+          {isHebrew ? 'יום זכרו נפל' : 'Memorial Day'}:
+          <br />
+          {memorialFormatted}
         </Text>
-        <Text fw={600} lineClamp={1} className={styles.metaText}>
-          {memorialFormatted && `${isHebrew ? 'יום זכרו נפל' : 'Memorial Day'}:`}
-        </Text>
-        <Text fw={600} lineClamp={1} className={styles.metaText}>
-          {memorialFormatted && memorialFormatted}
-        </Text>
+        )}
       </Box>
     </Card>
   )
