@@ -87,7 +87,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
-  padding-bottom: 10px;
   min-height: 0;
   background-color: rgba(250, 247, 240, 0.98);
 }
@@ -98,6 +97,18 @@
   align-items: center;
   min-height: 0;
   overflow: hidden;
+  margin: 0 auto;
+  min-width: 200px;
+  max-width: 33%;
+}
+
+@media (max-width: 1000px) {
+  .subjects {
+    display: block;
+  }
+  .subject {
+    display: inline-block;
+  }
 }
 
 .subjectText {
@@ -107,11 +118,8 @@
 }
 
 .subjectImage {
-  width: auto;
-  height: 100%;
-  max-width: 100%;
-  object-fit: contain;
+  max-width: calc(100% - 10px);
   border-radius: 30px;
-  flex: 1;
+  padding: 5px;
   min-height: 0;
 }

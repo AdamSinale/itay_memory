@@ -184,4 +184,3 @@ export function AddHeroForm({ isHebrew, onSuccess }: AddHeroFormProps) {
     </div>
   )
 }
-

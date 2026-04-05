@@ -1,7 +1,6 @@
 .card {
+  display: flex;
   flex: 1 1 0;
-  min-width: 120px;
-  box-shadow: 0 4px 16px rgba(184, 150, 46, 0.12);
   text-align: center;
   flex-direction: column;
   cursor: pointer;
@@ -59,19 +58,27 @@
 }
 
 .infoContainer {
-  background: radial-gradient(ellipse at center, rgba(250, 247, 240, 0.5) 0%, rgba(250, 247, 240, 0.8) 44%, rgba(250, 247, 240, 0.0) 73%, transparent 100%);
-  width: fit-content;
+  font-size: smaller;
+  flex: 1;
+  position: relative;
+  isolation: isolate;
+  width: 95%;
   margin: auto;
 }
 
-@media (max-width: 800px) {
-  .card {
-    flex: auto;
-    display: inline-block;
-    width: 33.33%;
-    margin: 0 !important;
-  }
-  .metaText {
-    display: none;
-  }
+/* Faded texture only (text stays full opacity) — same idea as SoldierPage .soldierBio::before */
+.infoContainer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('./TextConShort.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  opacity: 0.6;
+  z-index: -1;
+}
+.infoContainer p {
+  margin: 5px;
 }

@@ -10,14 +10,16 @@
 }
 
 .formCard {
-  aspect-ratio: 897/1535;
+  aspect-ratio: 897 / 1535;
   height: 90%;
   margin: auto 0;
   border-radius: 24px;
-  padding: 0 32px;
+  padding: 0 3%;
   box-shadow: 0 40px 40px rgba(15, 23, 42, 0.18);
   position: relative;
   isolation: isolate;
+  width: calc(100% - 8%);
+  max-width: 480px;
 }
 
 .formCard::before {
@@ -108,22 +110,21 @@
 }
 
 .submitFormButton {
-  max-width: 300px;
-  width: 80%;
+  width: 280px;
   margin: auto;
   background-image: url("./SubmitFormButton.png");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  aspect-ratio: 442/83;
+  aspect-ratio: 442 / 83;
   border: none;
   border-radius: 55px;
   color: white;
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  position: absolute;
   left: 0;
   right: 0;
   bottom: 5%;
+  margin: 10px calc(50% - 140px);
 }
